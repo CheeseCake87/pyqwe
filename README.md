@@ -1,6 +1,6 @@
 # 🏎️💨 pyqwe
 
-The Quick Work Environment.
+The Quick Work Environment for Python.
 
 Run commands quickly from the pyproject.toml file.
 
