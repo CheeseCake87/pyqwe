@@ -29,6 +29,7 @@ project/
 ```
 
 ```toml
+[tool.pyqwe]
 flask = "flask_app:run"
 ```
 
