@@ -17,7 +17,3 @@ qwe = "qwe:main"
 
 [project.urls]
 Source = "https://github.com/CheeseCake87/qwe"
-
-[tool.qwe]
-run = "*cmd:flask run"
-flask = "app:run"
