@@ -60,7 +60,7 @@ This will start the Flask app.
 
 ### *:... commands:
 
-Any command that is starts with `*` will be run using subprocess. 
+Any command that starts with `*` will be run using subprocess. 
 
 For example:
 
