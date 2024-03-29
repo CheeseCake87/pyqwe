@@ -25,10 +25,13 @@ class ArgumentParser(argparse.ArgumentParser):
         print(" -h, --help => Show the help message and exit")
         print(" -v, --version => Show the version and exit")
         print("\n\rCommands in pyproject.toml:")
-        for option in self.options:
-            print(
-                f" {Colr.OKBLUE}{option[0]}{Colr.END} "
-                f"{Colr.BOLD}=>{Colr.END} "
-                f"{Colr.OKCYAN}{option[1]}{Colr.END}"
-            )
+        if not self.options:
+            print(f" {Colr.WARNING}No commands found in pyproject.toml{Colr.END}")
+        else:
+            for option in self.options:
+                print(
+                    f" {Colr.OKBLUE}{option[0]}{Colr.END} "
+                    f"{Colr.BOLD}=>{Colr.END} "
+                    f"{Colr.OKCYAN}{option[1]}{Colr.END}"
+                )
         print("")
