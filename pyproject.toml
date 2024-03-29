@@ -17,3 +17,9 @@ pyqwe = "pyqwe:main"
 
 [project.urls]
 Source = "https://github.com/CheeseCake87/qwe"
+
+[tool.pyqwe]
+cmd_mod_flask = "*:flask --app flask_example/module.py run"
+cmd_pac_flask = "*:flask --app flask_example/package run"
+mod_flask = "flask_example.module:run"
+pac_flask = "flask_example.package:run"
