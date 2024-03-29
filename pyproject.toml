@@ -1,0 +1,22 @@
+[project]
+name = "qwe"
+description = 'Run commands set in the pyproject.toml file'
+authors = [{ name = "David Carmichael", email = "david@uilix.com" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+dynamic = ["version"]
+
+[project.scripts]
+qwe = "qwe:main"
+
+[project.urls]
+Source = "https://github.com/CheeseCake87/qwe"
+
+[build-system]
+requires = ["flit_core"]
+build-backend = "flit_core.buildapi"
+
+[tool.qwe]
+run = "*cmd:flask run"
+flask = "app:run"
