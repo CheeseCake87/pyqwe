@@ -47,7 +47,7 @@ The following command will run the function
 
 Now run the qwe command:
 
-`qwe flask`
+`pyqwe flask`
 
 and this will start the Flask app.
 
@@ -59,7 +59,7 @@ And command that is labeled with `*cmd` will be ran using subprocess.
 
 Now run the qwe command:
 
-`qwe say_hello`
+`pyqwe say_hello`
 
 and this will print `Hello World`.
 
