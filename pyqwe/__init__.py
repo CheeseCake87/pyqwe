@@ -4,7 +4,7 @@ from pathlib import Path
 from .helpers import *
 from .parser import ArgumentParser
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 # sr = start of runner
 # er = end of runner
