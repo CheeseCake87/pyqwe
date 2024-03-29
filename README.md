@@ -66,7 +66,7 @@ For example:
 
 ```toml
 [tool.pyqwe]
-say_hello = "*:echo Hello World"`
+say_hello = "*:echo Hello World"
 ```
 
 Now running the pyqwe command:
