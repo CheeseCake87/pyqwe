@@ -13,7 +13,7 @@ Add commands to the pyproject.toml file.
 ```toml
 [tool.pyqwe]
 flask = "flask_app:run"
-say_hello = "*cmd:echo Hello World"
+say_hello = "*:echo Hello World"
 ```
 
 ### Python commands:
@@ -28,10 +28,12 @@ project/
         __init__.py
 ```
 
-The following command will run the function
-`run` from the `__init__.py` file in the `flask_app` package.
+```toml
+flask = "flask_app:run"
+```
 
-`flask = "flask_app:run"`
+This command will run the function
+`run()` from the `__init__.py` file in the `flask_app` package.
 
 #### Module example:
 
@@ -40,36 +42,52 @@ project/
     app.py
 ```
 
-The following command will run the function
-`run` from the `app.py` file.
+```toml
+[tool.pyqwe]
+flask = "app:run"
+```
 
-`flask = "app:run"`
-
-Now run the qwe command:
-
-`pyqwe flask`
-
-and this will start the Flask app.
-
-### CMD labeled commands:
-
-And command that is labeled with `*cmd` will be ran using subprocess.
-
-`say_hello = "*cmd:echo Hello World"`
+This command will run the function
+`run()` from the `app.py` file.
 
 Now run the qwe command:
 
-`pyqwe say_hello`
+```bash
+pyqwe flask
+```
 
-and this will print `Hello World`.
+This will start the Flask app.
 
-#### Run as shell
+### *:... commands:
+
+Any command that is starts with `*` will be run using subprocess. 
+
+For example:
+
+```toml
+[tool.pyqwe]
+say_hello = "*:echo Hello World"`
+```
+
+Now running the pyqwe command:
+
+```bash
+pyqwe say_hello
+```
+
+Will print `Hello World`.
+
+### Run as shell
 
 To run the command as a subprocess shell command, add the `shell` key to the command.
 
-`say_hello = "*cmd-shell:echo Hello World"`
+```toml
+[tool.pyqwe]
+say_hello = "*shell:echo Hello World"
+```
 
 ### Other commands
 
-`-h` or `--help` will display all the commands set in the pyproject.toml file.
-`__version__` will display the version of qwe.
+`pyqwe` `-h` or `--help` will display all the commands set in the pyproject.toml file.
+
+`pyqwe` `__version__` will display the version of qwe.
