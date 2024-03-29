@@ -13,7 +13,7 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version"]
 
 [project.scripts]
-qwe = "qwe:main"
+pyqwe = "pyqwe:main"
 
 [project.urls]
 Source = "https://github.com/CheeseCake87/qwe"

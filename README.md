@@ -1,17 +1,17 @@
-# 🏎️💨 qwe
+# 🏎️💨 pyqwe
 
 The Quick Work Environment.
 
 Run commands quickly from the pyproject.toml file.
 
-`pip install qwe`
+`pip install pyqwe`
 
 ## Usage
 
 Add commands to the pyproject.toml file.
 
 ```toml
-[tool.qwe]
+[tool.pyqwe]
 flask = "flask_app:run"
 say_hello = "*cmd:echo Hello World"
 ```

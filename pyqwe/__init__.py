@@ -25,7 +25,7 @@ if not _pyproject_file.exists():
     raise FileNotFoundError("pyproject.toml not found")
 
 _pyproject = tomllib.loads(_pyproject_file.read_text())
-_qwe = _pyproject.get("tool", {}).get("qwe")
+_qwe = _pyproject.get("tool", {}).get("pyqwe")
 
 if not _qwe or not isinstance(_qwe, dict):
     raise ValueError("tool.qwe not found in pyproject.toml")
