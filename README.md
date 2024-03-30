@@ -63,7 +63,7 @@ flask = "app:run"
 This command will run the function
 `run()` from the `app.py` file.
 
-Now run the qwe command:
+Now run the pyqwe command:
 
 ```bash
 pyqwe flask
@@ -140,4 +140,4 @@ pip uninstall pyqwe-extra-dotenv
 
 `pyqwe` `-h` or `--help` will display all the commands set in the pyproject.toml file.
 
-`pyqwe` `__version__` will display the version of qwe.
+`pyqwe` `__version__` will display the version of pyqwe.
