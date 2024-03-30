@@ -9,6 +9,7 @@ pip install pyqwe
 ```
 
 For `.env` file support using python-dotenv:
+
 ```bash
 pip install pyqwe[dotenv]
 # If zsh install extra using:
@@ -127,6 +128,12 @@ or
 
 ```bash
 pip install pyqwe[dotenv]
+```
+
+To stop the behavior of looking for the `.env` when using pyqwe, uninstall the `pyqwe-extra-dotenv` package.
+
+```bash
+pip uninstall pyqwe-extra-dotenv
 ```
 
 ### Other commands
