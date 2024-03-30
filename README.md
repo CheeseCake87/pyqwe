@@ -16,7 +16,7 @@ pip install pyqwe[dotenv]
 pip install 'pyqwe[dotenv]'
 ```
 
-See [Environment variables](#using-environment-variables) for more information.
+See [using environment variables](#using-environment-variables) for more information.
 
 ## Usage
 
@@ -99,7 +99,7 @@ To run the command as a subprocess shell command, add the `shell` key to the com
 say_hello = "*shell:echo Hello World"
 ```
 
-### Using Environment variables
+### Using environment variables
 
 To use environment variables in the command, use the `{{ }}` syntax.
 
