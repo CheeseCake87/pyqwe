@@ -4,7 +4,18 @@ The Quick Work Environment for Python.
 
 Run commands quickly from the pyproject.toml file.
 
-`pip install pyqwe`
+```bash
+pip install pyqwe
+```
+
+For `.env` file support using python-dotenv:
+```bash
+pip install pyqwe[dotenv]
+# If zsh install extra using:
+pip install 'pyqwe[dotenv]'
+```
+
+See [Environment variables](#using-environment-variables) for more information.
 
 ## Usage
 
@@ -61,7 +72,7 @@ This will start the Flask app.
 
 ### *:... commands:
 
-Any command that starts with `*` will be run using subprocess. 
+Any command that starts with `*` will be run using subprocess.
 
 For example:
 
@@ -85,6 +96,37 @@ To run the command as a subprocess shell command, add the `shell` key to the com
 ```toml
 [tool.pyqwe]
 say_hello = "*shell:echo Hello World"
+```
+
+### Using Environment variables
+
+To use environment variables in the command, use the `{{ }}` syntax.
+
+```toml
+[tool.pyqwe]
+talk = "*shell:echo {{MESSAGE}}"
+```
+
+Now running the pyqwe command:
+
+```bash
+pyqwe talk
+```
+
+Will print the value of the `MESSAGE` environment variable.
+
+⚠️ **Note:** The environment variables must be set before running the command.
+
+pyqwe will not look for the `.env` file by default. To enable this, install the `pyqwe-extra-dotenv` package.
+
+```bash
+pip install pyqwe-extra-dotenv
+```
+
+or
+
+```bash
+pip install pyqwe[dotenv]
 ```
 
 ### Other commands

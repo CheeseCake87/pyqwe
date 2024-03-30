@@ -16,12 +16,16 @@ dynamic = ["version"]
 pyqwe = "pyqwe:main"
 
 [project.urls]
-Source = "https://github.com/CheeseCake87/qwe"
+Source = "https://github.com/CheeseCake87/pyqwe"
+
+[project.optional-dependencies]
+dotenv = ["pyqwe-extra-dotenv"]
 
 [tool.pyqwe]
 cmd_mod_flask = "*:flask --app flask_example/module.py run"
-cmd_pac_flask = "*:flask --app flask_example/package run"
+cmd_pac_flask = "*:flask --app flask_example/package run --port {{PORT}} --host {{HOST}}"
 mod_flask = "flask_example.module:run"
 pac_flask = "flask_example.package:run"
+format = "*:ruff format pyqwe"
 build = "*shell:flit build"
 publish = "*shell:export FLIT_USERNAME=__token__ && flit publish"
