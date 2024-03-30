@@ -10,4 +10,5 @@ class NotAFunction(Exception):
     pass
 
 
-__all__ = ["NotAModuleOrPackage", "FunctionNotFound", "NotAFunction"]
+class EnvVarNotFound(Exception):
+    pass

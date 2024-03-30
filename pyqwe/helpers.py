@@ -1,4 +1,6 @@
 import importlib
+import importlib.util
+import os
 import shlex
 import subprocess
 import sys
@@ -8,7 +10,29 @@ from .exceptions import (
     FunctionNotFound,
     NotAModuleOrPackage,
     NotAFunction,
+    EnvVarNotFound,
 )
+
+
+class Colr:
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = "\033[96m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+    END = "\033[0m"
+
+
+def _extra_rev() -> callable:
+    try:
+        from pyqwe_extra_dotenv import _replace_env_vars  # noqa
+    except ImportError:
+        raise ImportError("pyqwe_extra_dotenv package was not found")
+
+    return _replace_env_vars
 
 
 def _no_traceback_eh(exc_type, exc_val, traceback):
@@ -18,7 +42,7 @@ def _no_traceback_eh(exc_type, exc_val, traceback):
 def _split_runner(runner_: str) -> tuple:
     r = runner_.split(":")
     sr = r[0]  # start or runner
-    er = r[1].lower()  # end of runner
+    er = r[1]  # end of runner
     return sr, er
 
 
@@ -44,7 +68,7 @@ def _identify_sr(sr_: str, _cwd: Path) -> tuple[Path, str]:
         # sr is a module
         return Path(f"{sr}.py"), "module"
 
-    raise NotAModuleOrPackage(f"\n{sr} is not a Python module or package\n")
+    raise NotAModuleOrPackage(f"{sr} is not a Python module or package\n")
 
 
 def _path_to_module(path: Path) -> str:
@@ -53,7 +77,52 @@ def _path_to_module(path: Path) -> str:
     return f"{path_.name}.{file_}"
 
 
+def _extract_env_vars(r: str) -> list[str]:
+    if "{{" and "}}" in r:
+        return [i.split("}}")[0].replace(" ", "") for i in r.split("{{") if "}}" in i]
+    return []
+
+
+def _import_python_dotenv() -> bool:
+    try:
+        import dotenv
+
+        dotenv.load_dotenv()
+
+        return True
+
+    except ImportError:
+        return False
+
+
+def _replace_env_vars(r: str) -> str:
+    env_vars_ = _extract_env_vars(r)
+    python_dotenv_import_attempted = False
+
+    for env_var in env_vars_:
+        if not os.getenv(env_var):
+            # if env_var is not found
+            raise EnvVarNotFound(
+                "\n\r\n\r"
+                f"{Colr.FAIL}Environment variable {env_var} was not found.{Colr.END}"
+                "\n\r"
+            )
+
+        r = r.replace(f"{{{{{env_var}}}}}", os.getenv(env_var))
+
+    return r
+
+
 def _run(sr: str, er: str, _cwd: Path):
+    extra_dotenv = importlib.util.find_spec("pyqwe_extra_dotenv")
+    if extra_dotenv:
+        rev = _extra_rev()
+    else:
+        rev = _replace_env_vars
+
+    sr = rev(sr)
+    er = rev(er)
+
     try:
         if "*" in sr:
             if "shell" in sr:
@@ -83,12 +152,3 @@ def _run(sr: str, er: str, _cwd: Path):
         if sys.excepthook is sys.__excepthook__:
             sys.excepthook = _no_traceback_eh
         raise
-
-
-__all__ = [
-    "_no_traceback_eh",
-    "_split_runner",
-    "_identify_sr",
-    "_path_to_module",
-    "_run",
-]
