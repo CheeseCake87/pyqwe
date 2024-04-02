@@ -99,6 +99,29 @@ To run the command as a subprocess shell command, add the `shell` key to the com
 say_hello = "*shell:echo Hello World"
 ```
 
+### Change the working directory
+
+You can change the working directory of a subprocess by adding the folder 
+within parentheses to the command, `(node_app)` for example.
+
+**The folder must be relative** to the pyproject.toml file. 
+
+**Absolute paths are not supported**.
+
+**Moving up directories is not supported**, `../node_app` for example.
+
+```toml
+[tool.pyqwe]
+npm_install = "*(node_app):npm install"
+```
+
+This can be used with the `shell` key.
+
+```toml
+[tool.pyqwe]
+npm_install = "*shell(node_app):npm i"
+```
+
 ### Using environment variables
 
 To use environment variables in the command, use the `{{ }}` syntax.
