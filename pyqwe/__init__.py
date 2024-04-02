@@ -4,7 +4,7 @@ from pathlib import Path
 from .helpers import _run, _split_runner
 from .parser import ArgumentParser
 
-__version__ = "1.0.3"
+__version__ = "1.1.3"
 
 # sr = start of runner
 # er = end of runner
