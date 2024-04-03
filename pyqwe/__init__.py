@@ -5,7 +5,7 @@ from pathlib import Path
 from .helpers import _run, _split_runner, Colr
 from .parser import ArgumentParser
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 # sr = start of runner
 # er = end of runner
@@ -32,6 +32,9 @@ def main():
     list_parser = subp.add_parser("list")
     list_parser.set_defaults(list=False)
 
+    ls_parser = subp.add_parser("ls")
+    ls_parser.set_defaults(list=False)
+
     for entry, runner in _qwe.items():
         pars.options.append((entry, runner))
         _ = subp.add_parser(entry)
@@ -39,7 +42,7 @@ def main():
 
     args = pars.parse_args()
 
-    if hasattr(args, "list"):
+    if hasattr(args, "list") or hasattr(args, "ls"):
         print("")
         if not pars.options:
             print(f" {Colr.WARNING}No commands found in pyproject.toml{Colr.END}")
