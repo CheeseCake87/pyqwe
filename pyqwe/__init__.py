@@ -1,10 +1,11 @@
+import sys
 import tomllib
 from pathlib import Path
 
-from .helpers import _run, _split_runner
+from .helpers import _run, _split_runner, Colr
 from .parser import ArgumentParser
 
-__version__ = "1.1.3"
+__version__ = "1.2.0"
 
 # sr = start of runner
 # er = end of runner
@@ -28,12 +29,29 @@ def main():
     pars.add_argument("--help", "-h", action="help")
     subp = pars.add_subparsers()
 
+    list_parser = subp.add_parser("list")
+    list_parser.set_defaults(list=False)
+
     for entry, runner in _qwe.items():
         pars.options.append((entry, runner))
         _ = subp.add_parser(entry)
         _.set_defaults(entry=entry, runner=runner)
 
     args = pars.parse_args()
+
+    if hasattr(args, "list"):
+        print("")
+        if not pars.options:
+            print(f" {Colr.WARNING}No commands found in pyproject.toml{Colr.END}")
+        else:
+            for option in pars.options:
+                print(
+                    f" {Colr.OKCYAN}{option[0]}{Colr.END} "
+                    f"{Colr.BOLD}=>{Colr.END} "
+                    f"{Colr.HEADER}{option[1]}{Colr.END}"
+                )
+        print("")
+        sys.exit(0)
 
     try:
         _run(*_split_runner(args.runner), _cwd=_cwd)

@@ -28,6 +28,12 @@ flask = "flask_app:run"
 say_hello = "*:echo Hello World"
 ```
 
+You will be able to see what commands you have set in the pyproject.toml file by running:
+
+```bash
+pyqwe list
+```
+
 ### Python commands:
 
 For Python, the commands are structured like (package:module):function
@@ -101,10 +107,10 @@ say_hello = "*shell:echo Hello World"
 
 ### Change the working directory
 
-You can change the working directory of a subprocess by adding the folder 
+You can change the working directory of a subprocess by adding the folder
 within parentheses to the command, `(node_app)` for example.
 
-**The folder must be relative** to the pyproject.toml file. 
+**The folder must be relative** to the pyproject.toml file.
 
 **Absolute paths are not supported**.
 

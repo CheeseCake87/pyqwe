@@ -10,18 +10,13 @@ class ArgumentParser(argparse.ArgumentParser):
         self.options = []
 
     def print_help(self, file=None):
-        print("\n\rUsage: pyqwe <command>")
-        print("\n\rCommands:")
-        print(" -h, --help => Show the help message and exit")
-        print(" -v, --version => Show the version and exit")
-        print("\n\rCommands in pyproject.toml:")
-        if not self.options:
-            print(f" {Colr.WARNING}No commands found in pyproject.toml{Colr.END}")
-        else:
-            for option in self.options:
-                print(
-                    f" {Colr.OKBLUE}{option[0]}{Colr.END} "
-                    f"{Colr.BOLD}=>{Colr.END} "
-                    f"{Colr.OKCYAN}{option[1]}{Colr.END}"
-                )
+        print("\n\r"
+              "Usage: pyqwe <option> "
+              "\n\r\n\r"
+              f" {Colr.OKCYAN}list{Colr.END} => List all commands found in pyproject.toml"
+              "\n\r"
+              f" {Colr.OKCYAN}-h, --help{Colr.END} => Show the help message and exit"
+              "\n\r"
+              f" {Colr.OKCYAN}-v, --version{Colr.END} => Show the version and exit"
+              )
         print("")
