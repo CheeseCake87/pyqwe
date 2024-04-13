@@ -1,10 +1,10 @@
-import typing as t
 import importlib
 import importlib.util
 import os
 import shlex
 import subprocess
 import sys
+import typing as t
 from pathlib import Path
 
 from .exceptions import (
@@ -98,7 +98,6 @@ def _import_python_dotenv() -> bool:
 
 def _replace_env_vars(r: str) -> str:
     env_vars_ = _extract_env_vars(r)
-    python_dotenv_import_attempted = False
 
     for env_var in env_vars_:
         if not os.getenv(env_var):
@@ -127,7 +126,7 @@ def _run(sr: str, er: str, _cwd: Path):
     try:
         if "*" in sr:
             if "(" in sr:
-                _cwd_tack = sr[sr.find("(") + 1: sr.find(")")]
+                _cwd_tack = sr[sr.find("(") + 1 : sr.find(")")]
 
                 if sys.platform == "win32":
                     _cwd_tack = _cwd_tack.replace("/", "\\")
