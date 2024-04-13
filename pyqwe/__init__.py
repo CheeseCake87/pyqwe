@@ -1,17 +1,18 @@
 import sys
-import tomllib
 from pathlib import Path
 
 from .helpers import _run, _split_runner, Colr
 from .parser import ArgumentParser
 
-__version__ = "1.3.0"
+try:
+    import tomllib
+except ImportError:
+    try:
+        import toml as tomllib
+    except ImportError:
+        raise ImportError("pyqwe requires toml, install it with 'pip install toml'")
 
-# sr = start of runner
-# er = end of runner
-# runner = sr:er
-# flask = app:run
-# will invoke the run function in the app module
+__version__ = "1.4.0"
 
 _cwd = Path().cwd()
 _pyproject_file = _cwd / "pyproject.toml"

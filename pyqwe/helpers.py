@@ -1,3 +1,4 @@
+import typing as t
 import importlib
 import importlib.util
 import os
@@ -39,14 +40,14 @@ def _no_traceback_eh(exc_type, exc_val, traceback):
     pass
 
 
-def _split_runner(runner_: str) -> tuple:
+def _split_runner(runner_: str) -> t.Tuple:
     r = runner_.split(":")
     sr = r[0]  # start or runner
     er = r[1]  # end of runner
     return sr, er
 
 
-def _identify_sr(sr_: str, _cwd: Path) -> tuple[Path, str]:
+def _identify_sr(sr_: str, _cwd: Path) -> t.Tuple[Path, str]:
     if sr_.endswith(".py"):
         sr_.replace(".py", "")
 
@@ -77,7 +78,7 @@ def _path_to_module(path: Path) -> str:
     return f"{path_.name}.{file_}"
 
 
-def _extract_env_vars(r: str) -> list[str]:
+def _extract_env_vars(r: str) -> t.List[str]:
     if "{{" and "}}" in r:
         return [i.split("}}")[0].replace(" ", "") for i in r.split("{{") if "}}" in i]
     return []

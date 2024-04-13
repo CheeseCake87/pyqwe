@@ -7,7 +7,7 @@ name = "pyqwe"
 description = 'Run commands set in the pyproject.toml file'
 authors = [{ name = "David Carmichael", email = "david@uilix.com" }]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.8"
 license = { file = "LICENSE" }
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version"]
