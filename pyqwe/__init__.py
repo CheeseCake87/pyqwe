@@ -58,10 +58,12 @@ def main():
         sys.exit(0)
 
     try:
-        _run(*_split_runner(args.runner), _cwd=_cwd)
+        _runner = args.runner
+    except AttributeError:
+        pars.print_help()
         sys.exit(0)
+
+    try:
+        _run(*_split_runner(_runner), _cwd=_cwd)
     except Exception as e:
         print(f" {Colr.FAIL}{e}{Colr.END}")
-        sys.exit(0)
-    finally:
-        pars.print_help()
