@@ -59,9 +59,9 @@ def main():
 
     try:
         _run(*_split_runner(args.runner), _cwd=_cwd)
+        sys.exit(0)
     except Exception as e:
         print(f" {Colr.FAIL}{e}{Colr.END}")
         sys.exit(0)
-
-    pars.print_help()
-
+    finally:
+        pars.print_help()
