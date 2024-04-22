@@ -142,8 +142,8 @@ def _run(sr: str, er: str, _cwd: Path):
             sr_path, sr_type = _identify_sr(sr, _cwd)
 
             if sr_type == "package":
-                sys.path.append(str(sr_path))
-                module = importlib.import_module("__init__")
+                sys.path.append(str(sr_path.parent))
+                module = importlib.import_module(sr_path.name)
             else:
                 sys.path.append(str(_cwd))
                 module = importlib.import_module(sr)
