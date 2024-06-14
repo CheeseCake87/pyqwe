@@ -12,7 +12,7 @@ except ImportError:
     except ImportError:
         raise ImportError("pyqwe requires toml, install it with 'pip install toml'")
 
-__version__ = "1.5.1"
+__version__ = "1.5.2"
 
 _cwd = Path().cwd()
 _pyproject_file = _cwd / "pyproject.toml"
