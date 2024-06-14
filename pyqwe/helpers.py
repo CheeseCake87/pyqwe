@@ -43,7 +43,12 @@ def _no_traceback_eh(exc_type, exc_val, traceback):
 def _split_runner(runner_: str) -> t.Tuple:
     r = runner_.split(":")
     sr = r[0]  # start or runner
-    er = r[1]  # end of runner
+
+    if len(r) > 2:
+        er = ":".join(r[1:])  # end of runner
+    else:
+        er = r[1]  # end of runner
+
     return sr, er
 
 
