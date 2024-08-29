@@ -22,6 +22,7 @@ Source = "https://github.com/CheeseCake87/pyqwe"
 dotenv = ["pyqwe-extra-dotenv"]
 
 [tool.pyqwe]
+gunicorn = "*:gunicorn flask_example.package:create_app"
 cmd_mod_flask = "*:flask --app flask_example/module.py run"
 cmd_pac_flask = "*:flask --app flask_example/package run --port {{PORT}} --host {{HOST}}"
 mod_flask = "flask_example.module:run"
