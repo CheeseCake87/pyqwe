@@ -12,7 +12,7 @@ except ImportError:
     except ImportError:
         raise ImportError("pyqwe requires toml, install it with 'pip install toml'")
 
-__version__ = "1.5.2"
+__version__ = "1.6.0"
 
 _cwd = Path().cwd()
 _pyproject_file = _cwd / "pyproject.toml"
@@ -26,7 +26,9 @@ _qwe = _pyproject.get("tool", {}).get("pyqwe", {})
 
 def main():
     pars = ArgumentParser(prog="pyqwe", add_help=False)
-    pars.add_argument("--version", "-v", action="version", version=f"qwe {__version__}")
+    pars.add_argument(
+        "--version", "-v", action="version", version=f"pyqwe {__version__}"
+    )
     pars.add_argument("--help", "-h", action="help")
     subp = pars.add_subparsers()
 
@@ -57,13 +59,31 @@ def main():
         print("")
         sys.exit(0)
 
-    try:
+    if hasattr(args, "runner"):
         _runner = args.runner
-    except AttributeError:
-        pars.print_help()
-        sys.exit(0)
+
+    else:
+        if pars.errored:
+            sys.exit(0)
+
+        choice, choice_index = pars.print_chooser(_qwe)
+
+        if not choice or not choice.isdigit():
+            sys.exit(0)
+
+        if int(choice) == 0:
+            sys.exit(0)
+
+        if int(choice) > len(pars.options):
+            print(f" {Colr.FAIL}Invalid choice{Colr.END}")
+            sys.exit(0)
+
+        _runner = _qwe.get(choice_index[int(choice) - 1])
 
     try:
         _run(*_split_runner(_runner), _cwd=_cwd)
     except Exception as e:
-        print(f" {Colr.FAIL}{e}{Colr.END}")
+        if "pyqwe: error: argument" in str(e):
+            print(f" {Colr.FAIL}Invalid argument [{_runner}]{Colr.END}")
+        else:
+            print(f" {Colr.FAIL}{e}{Colr.END}")

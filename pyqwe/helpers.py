@@ -131,7 +131,7 @@ def _run(sr: str, er: str, _cwd: Path):
     try:
         if "*" in sr:
             if "(" in sr:
-                _cwd_tack = sr[sr.find("(") + 1: sr.find(")")]
+                _cwd_tack = sr[sr.find("(") + 1 : sr.find(")")]
 
                 if sys.platform == "win32":
                     _cwd_tack = _cwd_tack.replace("/", "\\")

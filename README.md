@@ -32,7 +32,31 @@ You will be able to see what commands you have set in the pyproject.toml file by
 
 ```bash
 pyqwe list
+# or
+pyqwe ls
 ```
+
+You can run the commands by using the command name:
+
+```bash
+pyqwe flask
+```
+
+Running `pyqwe` without any option or command will show all available commands in a menu you can choose from.
+
+```bash
+pyqwe
+```
+
+```text
+Available commands:
+0. Exit
+1. flask
+2. say_hello
+Select a command to run [0]:
+```
+
+Choosing `1` will run the `flask` command.
 
 ### Python commands:
 
