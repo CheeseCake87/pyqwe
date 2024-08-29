@@ -51,4 +51,6 @@ class ArgumentParser(argparse.ArgumentParser):
             runner_index.append(runner)
             print(f"{Colr.BOLD}{index + 1}.{Colr.END} {Colr.OKCYAN}{runner}{Colr.END}")
 
-        return input(f"{Colr.WARNING}Select a command to run [0]: {Colr.END}"), runner_index
+        return input(
+            f"{Colr.WARNING}Select a command to run [0]: {Colr.END}"
+        ), runner_index
