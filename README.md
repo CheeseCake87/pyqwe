@@ -49,7 +49,7 @@ pyqwe
 ```
 
 ```text
-Available commands:
+🏎️💨
 0. Exit
 1. flask
 2. say_hello

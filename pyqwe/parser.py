@@ -43,13 +43,14 @@ class ArgumentParser(argparse.ArgumentParser):
 
     @staticmethod
     def print_chooser(runners: dict):
-        print("")
-        print(f"{Colr.OKGREEN}{Colr.BOLD}Available commands:{Colr.END}{Colr.END}")
-        print(f"{Colr.FAIL}{Colr.BOLD}0.{Colr.END}{Colr.END} {Colr.FAIL}Exit{Colr.END}")
+        print("🏎️💨")
+        print(
+            f"{Colr.FAIL}{Colr.BOLD}0 :{Colr.END}{Colr.END} {Colr.FAIL}Exit{Colr.END}"
+        )
         runner_index = []
         for index, runner in enumerate(runners):
             runner_index.append(runner)
-            print(f"{Colr.BOLD}{index + 1}.{Colr.END} {Colr.OKCYAN}{runner}{Colr.END}")
+            print(f"{Colr.BOLD}{index + 1}{Colr.END} : {Colr.OKCYAN}{runner}{Colr.END}")
 
         return input(
             f"{Colr.WARNING}Select a command to run [0]: {Colr.END}"
