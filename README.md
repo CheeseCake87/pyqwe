@@ -55,9 +55,9 @@ pyqwe
 
 ```text
 🏎️💨
-0. Exit
-1. flask
-2. say_hello
+0 : Exit
+1 : flask
+2 : say_hello
 Select a command to run [0]:
 ```
 
