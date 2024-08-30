@@ -2,6 +2,11 @@
 
 The Quick Work Environment for Python.
 
+[![PyPI version](https://img.shields.io/pypi/v/pyqwe)](https://pypi.org/project/pyqwe/)
+[![License](https://img.shields.io/github/license/CheeseCake87/pyqwe)](https://raw.githubusercontent.com/CheeseCake87/pyqwe/main/LICENSE)
+![Downloads](https://static.pepy.tech/badge/pyqwe)
+![black](https://img.shields.io/badge/code%20style-black-000000.svg)
+
 Run commands quickly from the pyproject.toml file.
 
 ```bash
