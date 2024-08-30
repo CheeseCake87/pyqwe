@@ -21,6 +21,12 @@ Source = "https://github.com/CheeseCake87/pyqwe"
 [project.optional-dependencies]
 dotenv = ["pyqwe-extra-dotenv"]
 
+[tool.ruff]
+src = ["src"]
+fix = true
+show-fixes = true
+output-format = "full"
+
 [tool.pyqwe]
 gunicorn = "*:gunicorn flask_example.package:create_app"
 cmd_mod_flask = "*:flask --app flask_example/module.py run"
@@ -29,6 +35,6 @@ mod_flask = "flask_example.module:run"
 pac_flask = "flask_example.package:run"
 pac_flask_v1 = "*:flask --app flask_example:version_1 run"
 pac_flask_v2 = "*:flask --app flask_example:version_2 run"
-format = "*:ruff format pyqwe"
+format = "*:ruff format"
 build = "*shell:flit build"
 publish = "*shell:export FLIT_USERNAME=__token__ && flit publish"

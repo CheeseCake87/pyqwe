@@ -1,4 +1,5 @@
 import sys
+import traceback
 from pathlib import Path
 
 from .helpers import _run, _split_runner, Colr
@@ -83,7 +84,5 @@ def main():
     try:
         _run(*_split_runner(_runner), _cwd=_cwd)
     except Exception as e:
-        if "pyqwe: error: argument" in str(e):
-            print(f" {Colr.FAIL}Invalid argument [{_runner}]{Colr.END}")
-        else:
-            print(f" {Colr.FAIL}{e}{Colr.END}")
+        traceback.print_exc()
+        print(f"💥🏎️⁉️ {Colr.FAIL}{e}{Colr.END}")

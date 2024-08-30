@@ -74,7 +74,7 @@ class ArgumentParser(argparse.ArgumentParser):
             self.errored = True
 
     @staticmethod
-    def print_chooser(runners: dict):
+    def print_chooser(runners):
         print("🏎️💨")
         print(
             f"{Colr.FAIL}{Colr.BOLD}0 :{Colr.END}{Colr.END} {Colr.FAIL}Exit{Colr.END}"
