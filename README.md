@@ -7,7 +7,7 @@ The Quick Work Environment for Python.
 ![Downloads](https://static.pepy.tech/badge/pyqwe)
 ![black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
-Run commands quickly from the pyproject.toml file.
+Run commands quickly from the pyproject.toml (or pyqwe.toml) file.
 
 ```bash
 pip install pyqwe
@@ -32,6 +32,17 @@ Add commands to the pyproject.toml file.
 flask = "flask_app:run"
 say_hello = "*:echo Hello World"
 ```
+**If you're using a pyqwe.toml file you can drop the `[tool.pyqwe]`**
+
+```toml
+flask = "flask_app:run"
+say_hello = "*:echo Hello World"
+```
+
+🚨 **NOTE** 🚨 
+
+**If you have both a pyproject.toml and a pyqwe.toml file, the pyqwe.toml 
+file will be used and the pyproject.toml file will be ignored.**
 
 You will be able to see what commands you have set in the pyproject.toml file by running:
 

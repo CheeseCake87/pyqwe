@@ -2,6 +2,7 @@ import sys
 import traceback
 from pathlib import Path
 
+from .exceptions import InvalidRunner
 from .helpers import _run, _split_runner, Colr
 from .parser import ArgumentParser
 
@@ -13,16 +14,32 @@ except ImportError:
     except ImportError:
         raise ImportError("pyqwe requires toml, install it with 'pip install toml'")
 
-__version__ = "1.6.2"
+__version__ = "1.7.0"
 
 _cwd = Path().cwd()
-_pyproject_file = _cwd / "pyproject.toml"
+_known_toml_files = [
+    _cwd / "pyqwe.toml",
+    _cwd / "pyproject.toml",
+]
 
-if not _pyproject_file.exists():
-    raise FileNotFoundError("pyproject.toml not found")
 
-_pyproject = tomllib.loads(_pyproject_file.read_text())
-_qwe = _pyproject.get("tool", {}).get("pyqwe", {})
+def _find_toml_file() -> Path:
+    for file in _known_toml_files:
+        if file.exists():
+            return file
+    raise FileNotFoundError("pyproject.toml or pyqwe.toml file not found")
+
+
+_toml_file = _find_toml_file()
+_pyproject = tomllib.loads(_toml_file.read_text())
+
+if _toml_file.name == "pyqwe.toml":
+    if _pyproject.get("tool", {}).get("pyqwe", {}):
+        _qwe = _pyproject.get("tool", {}).get("pyqwe", {})
+    else:
+        _qwe = _pyproject
+else:
+    _qwe = _pyproject.get("tool", {}).get("pyqwe", {})
 
 
 def main():
@@ -49,14 +66,25 @@ def main():
     if hasattr(args, "list") or hasattr(args, "ls"):
         print("")
         if not pars.options:
-            print(f" {Colr.WARNING}No commands found in pyproject.toml{Colr.END}")
+            print(f" {Colr.WARNING}No commands found, looking in: {_toml_file.name}{Colr.END}")
         else:
             for option in pars.options:
+
+                try:
+                    if not isinstance(option[1], str):
+                        raise InvalidRunner()
+                except Exception as e:
+                    _ = e
+                    print(f"💥🏎️⁉️ {Colr.FAIL}Invalid runner: {option}{Colr.END}")
+                    print("")
+                    sys.exit(0)
+
                 print(
                     f" {Colr.OKCYAN}{option[0]}{Colr.END} "
                     f"{Colr.BOLD}=>{Colr.END} "
                     f"{Colr.HEADER}{option[1]}{Colr.END}"
                 )
+
         print("")
         sys.exit(0)
 
