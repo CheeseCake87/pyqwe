@@ -16,7 +16,7 @@ except ImportError:
     except ImportError:
         raise ImportError("pyqwe requires toml, install it with 'pip install toml'")
 
-__version__ = "1.7.1"
+__version__ = "1.8.0"
 
 _cwd = Path().cwd()
 _known_toml_files = [
@@ -73,7 +73,7 @@ def main():
             for option in pars.options:
 
                 try:
-                    if not isinstance(option[1], str):
+                    if type(option[1]) not in [str, list]:
                         raise InvalidRunner()
                 except Exception as e:
                     _ = e
@@ -81,11 +81,18 @@ def main():
                     print("")
                     sys.exit(0)
 
-                print(
-                    f" {Colr.OKCYAN}{option[0]}{Colr.END} "
-                    f"{Colr.BOLD}=>{Colr.END} "
-                    f"{Colr.HEADER}{option[1]}{Colr.END}"
-                )
+                if isinstance(option[1], list):
+                    print(f"{Colr.OKCYAN}{option[0]}{Colr.END} {Colr.BOLD}↩︎{Colr.END}  ")
+                    for func in option[1]:
+                        print(
+                            f"  {Colr.BOLD}=>{Colr.END} {Colr.HEADER}{func}{Colr.END}"
+                        )
+                else:
+                    print(
+                        f"{Colr.OKCYAN}{option[0]}{Colr.END} "
+                        f"{Colr.BOLD}=>{Colr.END} "
+                        f"{Colr.HEADER}{option[1]}{Colr.END}"
+                    )
 
         print("")
         sys.exit(0)
