@@ -1,5 +1,7 @@
 import sys
+import threading
 import traceback
+from functools import partial
 from pathlib import Path
 
 from .exceptions import InvalidRunner
@@ -110,7 +112,37 @@ def main():
         _runner = _qwe.get(choice_index[int(choice) - 1])
 
     try:
-        _run(*_split_runner(_runner), _cwd=_cwd)
+        if isinstance(_runner, list):
+            try:
+                print(f"🏎💨🏎💨🏎💨 {Colr.FAIL}Starting runners{Colr.END}")
+                func_list = []
+                threads = []
+
+                for func in _runner:
+                    func_list.append(partial(_run, *_split_runner(func), _cwd=_cwd))
+
+                for func in func_list:
+                    threads.append(threading.Thread(target=func))
+
+                for thread in threads:
+                    thread.start()
+
+                for thread in threads:
+                    thread.join()
+
+            except KeyboardInterrupt:
+                print(f" 🏁🏎🏎🏎 {Colr.FAIL}Runners stopped{Colr.END}")
+
+            except Exception as e:
+                print(f"💥🏎️⁉️ {Colr.FAIL}{e}{Colr.END}")
+
+        else:
+            print(f"🏎💨 {Colr.FAIL}Starting runner{Colr.END}")
+            _run(*_split_runner(_runner), _cwd=_cwd)
+
+    except KeyboardInterrupt:
+        print(f" 🏁🏎 {Colr.FAIL}Runner stopped{Colr.END}")
+
     except Exception as e:
         traceback.print_exc()
         print(f"💥🏎️⁉️ {Colr.FAIL}{e}{Colr.END}")
