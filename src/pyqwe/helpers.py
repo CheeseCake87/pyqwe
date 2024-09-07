@@ -118,7 +118,7 @@ def _replace_env_vars(r: str) -> str:
     return r
 
 
-def _run(sr: str, er: str, _cwd: Path):
+def _run(sr: str, er: str, _cwd: Path) -> None:
     extra_dotenv = importlib.util.find_spec("pyqwe_extra_dotenv")
     if extra_dotenv:
         rev = _extra_rev()
@@ -131,7 +131,7 @@ def _run(sr: str, er: str, _cwd: Path):
     try:
         if "*" in sr:
             if "(" in sr:
-                _cwd_tack = sr[sr.find("(") + 1 : sr.find(")")]
+                _cwd_tack = sr[sr.find("(") + 1: sr.find(")")]
 
                 if sys.platform == "win32":
                     _cwd_tack = _cwd_tack.replace("/", "\\")
