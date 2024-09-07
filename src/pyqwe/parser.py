@@ -75,7 +75,7 @@ class ArgumentParser(argparse.ArgumentParser):
 
     @staticmethod
     def print_chooser(runners):
-        print("🏎️💨")
+        print("🚥|🏎️")
         print(
             f"{Colr.FAIL}{Colr.BOLD}0 :{Colr.END}{Colr.END} {Colr.FAIL}Exit{Colr.END}"
         )
