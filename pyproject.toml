@@ -38,3 +38,8 @@ pac_flask_v2 = "*:flask --app flask_example:version_2 run"
 format = "*:ruff format"
 build = "*shell:flit build"
 publish = "*shell:export FLIT_USERNAME=__token__ && flit publish"
+group = [
+    "*:flask --app flask_example/package run --port 5001 --debug",
+    "*:flask --app flask_example/package run --port 5002 --debug",
+    "*:flask --app flask_example/package run --port 5003"
+]
