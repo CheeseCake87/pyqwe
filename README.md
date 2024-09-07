@@ -23,9 +23,23 @@ pip install 'pyqwe[dotenv]'
 
 See [using environment variables](#using-environment-variables) for more information.
 
+
+<!-- TOC -->
+* [🏎️💨 pyqwe](#-pyqwe)
+  * [Usage](#usage)
+  * [Python commands](#python-commands)
+    * [Package example](#package-example)
+    * [Module example](#module-example)
+  * [*:... commands (terminal)](#-commands-terminal)
+    * [Run as shell](#run-as-shell)
+    * [Change the working directory](#change-the-working-directory)
+  * [Using environment variables](#using-environment-variables)
+  * [Other commands](#other-commands)
+<!-- TOC -->
+
 ## Usage
 
-Add commands to the pyproject.toml file.
+Add commands to the pyproject.toml or pyqwe.toml file.
 
 ```toml
 [tool.pyqwe]
@@ -37,6 +51,18 @@ say_hello = "*:echo Hello World"
 ```toml
 flask = "flask_app:run"
 say_hello = "*:echo Hello World"
+```
+
+**_-- New in 1.8.0 ↓_**
+
+Commands can be grouped and run together as one. `ctrl` + `c` will stop all runners in the group at once.
+
+```toml
+[tool.pyqwe]
+group = [
+    "flask_app:run", 
+    "*:echo Hello World"
+]
 ```
 
 🚨 **NOTE** 🚨 
@@ -65,7 +91,7 @@ pyqwe
 ```
 
 ```text
-🏎️💨
+🚥|🏎️
 0 : Exit
 1 : flask
 2 : say_hello
@@ -74,11 +100,11 @@ Select a command to run [0]:
 
 Choosing `1` will run the `flask` command.
 
-### Python commands:
+## Python commands
 
-For Python, the commands are structured like (package:module):function
+For Python, the commands are structured like (package &/ module):function
 
-#### Package example:
+### Package example
 
 ```text
 project/
@@ -94,7 +120,7 @@ flask = "flask_app:run"
 This command will run the function
 `run()` from the `__init__.py` file in the `flask_app` package.
 
-#### Module example:
+### Module example
 
 ```text
 project/
@@ -117,7 +143,7 @@ pyqwe flask
 
 This will start the Flask app.
 
-### *:... commands:
+## *:... commands (terminal)
 
 Any command that starts with `*` will be run using subprocess.
 
@@ -161,14 +187,14 @@ within parentheses to the command, `(node_app)` for example.
 npm_install = "*(node_app):npm install"
 ```
 
-This can be used with the `shell` key.
+The `shell` key is still available when changing the directory.
 
 ```toml
 [tool.pyqwe]
 npm_install = "*shell(node_app):npm i"
 ```
 
-### Using environment variables
+## Using environment variables
 
 To use environment variables in the command, use the `{{ }}` syntax.
 
@@ -205,7 +231,7 @@ To stop the behavior of looking for the `.env` when using pyqwe, uninstall the `
 pip uninstall pyqwe-extra-dotenv
 ```
 
-### Other commands
+## Other commands
 
 `pyqwe` `-h` or `--help` will display all the commands set in the pyproject.toml file.
 
