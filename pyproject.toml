@@ -40,3 +40,15 @@ group = [
     "*:gunicorn flask_example.package:create_app()",
     "*:flask --app flask_example/package run --port 5003"
 ]
+group_run_async = [
+    "@async",
+    "*:echo 'Hello, World! 1'",
+    "*:echo 'Hello, World! 2'",
+    "*:echo 'Hello, World! 3'"
+]
+group_run_sync = [
+    "@sync",
+    "*:echo 'Hello, World! 1'",
+    "*:echo 'Hello, World! 2'",
+    "*:echo 'Hello, World! 3'"
+]

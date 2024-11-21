@@ -53,17 +53,13 @@ flask = "flask_app:run"
 say_hello = "*:echo Hello World"
 ```
 
-**_-- New in 1.8.0 ↓_**
+---
 
-Commands can be grouped and run together as one. `ctrl` + `c` will stop all runners in the group at once.
+**_-- New in 1.9.0 ↓_**
 
-```toml
-[tool.pyqwe]
-group = [
-    "flask_app:run", 
-    "*:echo Hello World"
-]
-```
+Sync / Async [Grouped commands](#grouped-commands)
+
+---
 
 🚨 **NOTE** 🚨 
 
@@ -231,8 +227,47 @@ To stop the behavior of looking for the `.env` when using pyqwe, uninstall the `
 pip uninstall pyqwe-extra-dotenv
 ```
 
+## Grouped commands
+
+You can group commands together in a list to have one pyqwe command run multiple commands.
+
+Grouped commands can also be run in sync / async mode. Async being the default.
+
+This will run the commands in the group in sequence, one after the other:
+```toml
+group = [
+    "@sync",
+    "*:echo 'Hello, World! 1'",
+    "*:echo 'Hello, World! 2'",
+    "*:echo 'Hello, World! 3'"
+]
+```
+
+This will run the commands in the group in parallel:
+```toml
+[tool.pyqwe]
+group = [
+    "@async",
+    "*:echo 'Hello, World! 1'",
+    "*:echo 'Hello, World! 2'",
+    "*:echo 'Hello, World! 3'"
+]
+```
+
+Of course, you can leave out the `@sync` or `@async` to use the default async mode.
+
+For example, this will also run the commands in the group in parallel:
+```toml
+[tool.pyqwe]
+group = [
+    "*:echo 'Hello, World! 1'",
+    "*:echo 'Hello, World! 2'",
+    "*:echo 'Hello, World! 3'"
+]
+```
+
 ## Other commands
 
-`pyqwe` `-h` or `--help` will display all the commands set in the pyproject.toml file.
+`pyqwe` `-h` or `--help` will display help information.
 
-`pyqwe` `__version__` will display the version of pyqwe.
+`pyqwe` `--version` or `-v` will display the version of pyqwe.

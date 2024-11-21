@@ -16,7 +16,7 @@ except ImportError:
     except ImportError:
         raise ImportError("pyqwe requires toml, install it with 'pip install toml'")
 
-__version__ = "1.8.0"
+__version__ = "1.9.0"
 
 _cwd = Path().cwd()
 _known_toml_files = [
@@ -120,8 +120,34 @@ def main():
 
     try:
         if isinstance(_runner, list):
+            sync_ = True if _runner[0] == "@sync" else False
+            async_ = True if _runner[0] == "@async" else False
+            # async_ is default
+
+            if sync_:
+                _runner.pop(0)
+
+                print(f"🏎💨⏱️ {Colr.FAIL}Starting runners in sync{Colr.END}")
+                for func in _runner:
+                    try:
+                        _run(*_split_runner(func), _cwd=_cwd)
+
+                    except KeyboardInterrupt:
+                        print(f" 🏁🏎 {Colr.FAIL}Runner stopped{Colr.END}")
+                        break
+
+                    except Exception as e:
+                        traceback.print_exc()
+                        print(f"💥🏎️⁉️ {Colr.FAIL}{e}{Colr.END}")
+
+                print(f" 🏁🏎 {Colr.FAIL}Runners stopped{Colr.END}")
+                sys.exit(0)
+
+            if async_:
+                _runner.pop(0)
+
             try:
-                print(f"🏎💨🏎💨🏎💨 {Colr.FAIL}Starting runners{Colr.END}")
+                print(f"🏎💨🏎💨🏎💨 {Colr.FAIL}Starting runners in async{Colr.END}")
                 func_list = []
                 threads = []
 

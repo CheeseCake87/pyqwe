@@ -34,6 +34,10 @@ class ArgumentParser(argparse.ArgumentParser):
             "\n\r"
             "<command> = <runner>"
             "\n\r\n\r"
+            f"{Colr.WARNING}pyqwe.toml command format:{Colr.END}"
+            "\n\r\n\r"
+            "<command> = <runner>"
+            "\n\r\n\r"
             f"{Colr.WARNING}Runner guide:{Colr.END}"
             "\n\r\n\r"
             f"{Colr.BOLD}Python Module / Package Runner:{Colr.END}"
@@ -59,6 +63,34 @@ class ArgumentParser(argparse.ArgumentParser):
             " run_this = '*shell:echo hello' > Run in terminal using shell"
             "\n\r"
             " run_this = '*shell(folder):echo hello' > Run in terminal using shell from the specified relative folder"
+            "\n\r\n\r"
+            f"{Colr.BOLD}Grouped Runner:{Colr.END}"
+            "\n\r\n\r"
+            " Run a group of commands in sequence or parallel, running in parallel ignores blocking."
+            "\n\r\n\r"
+            f" {Colr.BOLD}Run in Sync:{Colr.END}"
+            "\n\r"
+            """ \
+ run_this = [
+     '@sync',
+     '*:echo hello 1'
+     '*:echo hello 2'
+     '*:echo hello 3'
+ ]
+            """
+            "\n\r"
+            f" {Colr.BOLD}Run in Async:{Colr.END}"
+            "\n\r"
+            """ \
+ run_this = [
+     '@async',
+     '*:echo hello 1'
+     '*:echo hello 2'
+     '*:echo hello 3'
+ ]
+            """
+            "\n\r"
+            f"For a more detailed guide, visit {Colr.OKCYAN}https://github.com/CheeseCake87/pyqwe/blob/main/README.md{Colr.END}"
         )
         print("")
 
