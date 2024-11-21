@@ -21,8 +21,7 @@ pip install pyqwe[dotenv]
 pip install 'pyqwe[dotenv]'
 ```
 
-See [using environment variables](#using-environment-variables) for more information.
-
+---
 
 <!-- TOC -->
 * [🏎️💨 pyqwe](#-pyqwe)
@@ -34,8 +33,17 @@ See [using environment variables](#using-environment-variables) for more informa
     * [Run as shell](#run-as-shell)
     * [Change the working directory](#change-the-working-directory)
   * [Using environment variables](#using-environment-variables)
+  * [Grouped commands](#grouped-commands)
   * [Other commands](#other-commands)
 <!-- TOC -->
+
+---
+
+**_-- New in 1.9.0 ↓_**
+
+Sync / Async [Grouped commands](#grouped-commands)
+
+---
 
 ## Usage
 
@@ -46,6 +54,7 @@ Add commands to the pyproject.toml or pyqwe.toml file.
 flask = "flask_app:run"
 say_hello = "*:echo Hello World"
 ```
+
 **If you're using a pyqwe.toml file you can drop the `[tool.pyqwe]`**
 
 ```toml
@@ -53,17 +62,9 @@ flask = "flask_app:run"
 say_hello = "*:echo Hello World"
 ```
 
----
+🚨 **NOTE** 🚨
 
-**_-- New in 1.9.0 ↓_**
-
-Sync / Async [Grouped commands](#grouped-commands)
-
----
-
-🚨 **NOTE** 🚨 
-
-**If you have both a pyproject.toml and a pyqwe.toml file, the pyqwe.toml 
+**If you have both a pyproject.toml and a pyqwe.toml file, the pyqwe.toml
 file will be used and the pyproject.toml file will be ignored.**
 
 You will be able to see what commands you have set in the pyproject.toml file by running:
@@ -234,6 +235,7 @@ You can group commands together in a list to have one pyqwe command run multiple
 Grouped commands can also be run in sync / async mode. Async being the default.
 
 This will run the commands in the group in sequence, one after the other:
+
 ```toml
 group = [
     "@sync",
@@ -244,6 +246,7 @@ group = [
 ```
 
 This will run the commands in the group in parallel:
+
 ```toml
 [tool.pyqwe]
 group = [
@@ -257,6 +260,7 @@ group = [
 Of course, you can leave out the `@sync` or `@async` to use the default async mode.
 
 For example, this will also run the commands in the group in parallel:
+
 ```toml
 [tool.pyqwe]
 group = [
