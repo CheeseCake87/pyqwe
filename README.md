@@ -237,6 +237,7 @@ Grouped commands can also be run in sync / async mode. Async being the default.
 This will run the commands in the group in sequence, one after the other:
 
 ```toml
+[tool.pyqwe]
 group = [
     "@sync",
     "*:echo 'Hello, World! 1'",
