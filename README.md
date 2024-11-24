@@ -39,10 +39,11 @@ pip install 'pyqwe[dotenv]'
 
 ---
 
-**_-- New in 1.9.0 ↓_**
+**_-- New in 2.0.x ↓_**
 
-Sync / Async [Grouped commands](#grouped-commands)
+New `@step` runner in [Grouped commands](#grouped-commands)
 
+[See all releases](https://github.com/CheeseCake87/pyqwe/releases)
 ---
 
 ## Usage

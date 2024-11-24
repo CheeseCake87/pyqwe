@@ -9,7 +9,7 @@ from .exceptions import InvalidRunner
 from .helpers import _find_toml_file, _get_toml, _run, _split_runner, Colr
 from .parser import ArgumentParser
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 CWD = Path().cwd()
 TOML_FILE, QWE = _get_toml(CWD)
