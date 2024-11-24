@@ -232,7 +232,20 @@ pip uninstall pyqwe-extra-dotenv
 
 You can group commands together in a list to have one pyqwe command run multiple commands.
 
-Grouped commands can also be run in sync / async mode. Async being the default.
+Grouped commands can also be run in Step, Sync, or Async mode. Async being the default.
+
+This will run the commands in the group in sequence, pausing for confirmation between each command:
+
+```toml
+[tool.pyqwe]
+group = [
+    "@step",
+    "*:echo 'Hello, World! 1'",
+    "*:echo 'Hello, World! 2'",
+    "*:echo 'Hello, World! 3'"
+]
+```
+
 
 This will run the commands in the group in sequence, one after the other:
 
@@ -258,7 +271,7 @@ group = [
 ]
 ```
 
-Of course, you can leave out the `@sync` or `@async` to use the default async mode.
+Of course, you can leave out the `@step`, `@sync` or `@async` to use the default async mode.
 
 For example, this will also run the commands in the group in parallel:
 
