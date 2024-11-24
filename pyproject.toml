@@ -18,9 +18,6 @@ pyqwe = "pyqwe:main"
 [project.urls]
 Source = "https://github.com/CheeseCake87/pyqwe"
 
-[project.optional-dependencies]
-dotenv = ["pyqwe-extra-dotenv"]
-
 [tool.ruff]
 src = ["src"]
 fix = true
