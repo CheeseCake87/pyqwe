@@ -16,3 +16,7 @@ class InvalidRunner(Exception):
 
 class EnvVarNotFound(Exception):
     pass
+
+
+class DotenvLibNotFound(Exception):
+    pass

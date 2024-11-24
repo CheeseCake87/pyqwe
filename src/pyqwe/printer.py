@@ -30,8 +30,27 @@ def invalid_runner(option: str):
     br()
 
 
+def env_vars_no_dotenv():
+    print(
+        f"{Colr.FAIL}Environment variables set but python-dotenv is not installed.{Colr.END}"
+        "\n\r\n\r"
+        "pip install python-dotenv"
+        "\n\r\n\r"
+        "You can ignore this message by setting:"
+        "\n\r"
+        "[tool.pyqwe]"
+        "\n\r"
+        "`__IGNORE_DOTENV__ = true`"
+        "\n\r"
+    )
+
+
 def invalid_choice():
     print(f" {Colr.FAIL}Invalid choice{Colr.END}")
+
+
+def soft_crash(error):
+    print(f"💥🏎️⁉️{Colr.FAIL}{error}{Colr.END}")
 
 
 def crash(error: Exception):
@@ -48,11 +67,15 @@ def message_(message: str):
 
 
 def menu_start():
-    print(f"🚥|🏎️ {Colr.FAIL}{Colr.BOLD}0 :{Colr.END}{Colr.END} {Colr.FAIL}Exit{Colr.END}")
+    print(
+        f"🚥|🏎️ {Colr.FAIL}{Colr.BOLD}0 :{Colr.END}{Colr.END} {Colr.FAIL}Exit{Colr.END}"
+    )
 
 
 def menu_option(index: int, runner: str):
-    print(f"{Colr.BOLD}{Colr.OKCYAN}{index : 3}{Colr.END}{Colr.END} : {Colr.HEADER}{runner}{Colr.END}")
+    print(
+        f"{Colr.BOLD}{Colr.OKCYAN}{index : 3}{Colr.END}{Colr.END} : {Colr.HEADER}{runner}{Colr.END}"
+    )
 
 
 def option_value_list(name: str, value: list):
@@ -84,7 +107,9 @@ def starting_runner():
 
 
 def starting_step_runners():
-    print(f"🟢🏎💨🛑🏎 {Colr.OKGREEN}Starting runners in STEP{Colr.END} {Colr.FAIL}(ctrl + c to abort){Colr.END}")
+    print(
+        f"🟢🏎💨🛑🏎 {Colr.OKGREEN}Starting runners in STEP{Colr.END} {Colr.FAIL}(ctrl + c to abort){Colr.END}"
+    )
 
 
 def starting_sync_runners():

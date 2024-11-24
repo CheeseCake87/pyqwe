@@ -25,23 +25,22 @@ pip install 'pyqwe[dotenv]'
 
 <!-- TOC -->
 * [🏎️💨 pyqwe](#-pyqwe)
-  * [Usage](#usage)
   * [Python commands](#python-commands)
     * [Package example](#package-example)
     * [Module example](#module-example)
   * [*:... commands (terminal)](#-commands-terminal)
     * [Run as shell](#run-as-shell)
     * [Change the working directory](#change-the-working-directory)
-  * [Using environment variables](#using-environment-variables)
   * [Grouped commands](#grouped-commands)
+  * [Using environment variables](#using-environment-variables)
   * [Other commands](#other-commands)
 <!-- TOC -->
 
 ---
 
-**_-- New in 2.0.x ↓_**
+**_-- New in 2.1.x ↓_**
 
-New `@step` runner in [Grouped commands](#grouped-commands)
+Advanced environment variable functionality [Using environment variables](#using-environment-variables).
 
 [See all releases](https://github.com/CheeseCake87/pyqwe/releases)
 
@@ -193,43 +192,6 @@ The `shell` key is still available when changing the directory.
 npm_install = "*shell(node_app):npm i"
 ```
 
-## Using environment variables
-
-To use environment variables in the command, use the `{{ }}` syntax.
-
-```toml
-[tool.pyqwe]
-talk = "*shell:echo {{MESSAGE}}"
-```
-
-Now running the pyqwe command:
-
-```bash
-pyqwe talk
-```
-
-Will print the value of the `MESSAGE` environment variable.
-
-⚠️ **Note:** The environment variables must be set before running the command.
-
-pyqwe will not look for the `.env` file by default. To enable this, install the `pyqwe-extra-dotenv` package.
-
-```bash
-pip install pyqwe-extra-dotenv
-```
-
-or
-
-```bash
-pip install pyqwe[dotenv]
-```
-
-To stop the behavior of looking for the `.env` when using pyqwe, uninstall the `pyqwe-extra-dotenv` package.
-
-```bash
-pip uninstall pyqwe-extra-dotenv
-```
-
 ## Grouped commands
 
 You can group commands together in a list to have one pyqwe command run multiple commands.
@@ -247,7 +209,6 @@ group = [
     "*:echo 'Hello, World! 3'"
 ]
 ```
-
 
 This will run the commands in the group in sequence, one after the other:
 
@@ -285,6 +246,56 @@ group = [
     "*:echo 'Hello, World! 3'"
 ]
 ```
+
+## Using environment variables
+
+To use environment variables in the command, use the `{{ }}`
+markers, these markers are the default but can be changed.
+
+pyqwe will evaluate any environment variables that are set before running any commands.
+
+If pyqwe detects an environment variable that is not set, it will raise an error. An error will
+also be raised if environment variables are detected, and you do not have `python-dotenv` installed.
+
+Here's an example of setting an environment variable in a command:
+
+```toml
+[tool.pyqwe]
+talk = "*shell:echo {{MESSAGE}}"
+```
+
+You can change the environment variable markers by changing the `__env_marker_start__` and `__env_marker_end__` settings
+keys.
+
+```toml
+[tool.pyqwe]
+__env_marker_start__ = "*"
+__env_marker_end__ = "*"
+talk = "*shell:echo *MESSAGE*"
+```
+
+pyqwe uses `load_dotenv()` from `python-dotenv` to load the `.env` file. You can change the name of the file to load, or
+add multiple env files by setting the `__env_files__` settings key.
+
+```toml
+[tool.pyqwe]
+__env_files__ = [".env", ".env.local"]
+talk = "*shell:echo *MESSAGE*"
+```
+
+This is the same as running `load_dotenv(".env")` and `load_dotenv(".env.local")`.
+
+If you want to disable pyqwe from doing anything with environment variables, you can set the `__env_ignore__` settings
+key to `true`.
+
+```toml
+[tool.pyqwe]
+__env_ignore__ = true
+talk = "*shell:echo {{MESSAGE}}"
+```
+
+This will disable the environment variable evaluation and loading of the `.env` file, and result in `{{MESSAGE}}` being
+printed to the console in this case.
 
 ## Other commands
 
