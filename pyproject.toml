@@ -25,6 +25,10 @@ show-fixes = true
 output-format = "full"
 
 [tool.pyqwe]
+__env_ignore__ = false
+__env_marker_start__ = "{{"
+__env_marker_end__ = "}}"
+__env_files__ = [".env.example"]
 gunicorn = "*:gunicorn flask_example.package:create_app()"
 cmd_mod_flask = "*:flask --app flask_example/module.py run"
 cmd_pac_flask = "*:flask --app flask_example/package run --port {{PORT}} --host {{HOST}}"
@@ -32,6 +36,7 @@ mod_flask = "flask_example.module:run"
 pac_flask = "flask_example.package:run"
 pac_flask_v1 = "*:flask --app flask_example:version_1 run"
 pac_flask_v2 = "*:flask --app flask_example:version_2 run"
+env_var_test = "*:echo '{{ TEST }}'"
 group_run = [
     "flask_example.module:run",
     "*:gunicorn flask_example.package:create_app()",
@@ -54,4 +59,10 @@ group_run_async = [
     "*:echo 'Hello, World! 1'",
     "*:echo 'Hello, World! 2'",
     "*:echo 'Hello, World! 3'"
+]
+group_run_sync_env_var = [
+    "@sync",
+    "*:echo 'Hello, World! {{ TEST }} 1'",
+    "*:echo 'Hello, World! {{ TEST }} 2'",
+    "*:echo 'Hello, World! {{ TEST }} 3'"
 ]

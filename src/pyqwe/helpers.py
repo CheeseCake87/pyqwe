@@ -7,11 +7,12 @@ import sys
 import typing as t
 from pathlib import Path
 
+from pyqwe import printer
+
 from .exceptions import (
     FunctionNotFound,
     NotAModuleOrPackage,
     NotAFunction,
-    EnvVarNotFound,
 )
 
 
@@ -27,7 +28,7 @@ class Colr:
     END = "\033[0m"
 
 
-def _load_toml(file: Path) -> t.Dict[str, t.Any]:
+def load_toml(file: Path) -> t.Dict[str, t.Any]:
     try:
         import tomllib
     except ImportError:
@@ -39,7 +40,7 @@ def _load_toml(file: Path) -> t.Dict[str, t.Any]:
     return tomllib.loads(file.read_text())
 
 
-def _find_toml_file(cwd: Path) -> Path:
+def find_toml_file(cwd: Path) -> Path:
     _known_toml_files = [
         cwd / "pyqwe.toml",
         cwd / "pyproject.toml",
@@ -52,12 +53,12 @@ def _find_toml_file(cwd: Path) -> Path:
     raise FileNotFoundError("No pyqwe.toml or pyproject.toml file found")
 
 
-def _get_toml(cwd: Path) -> t.Tuple[Path, t.Dict[str, t.Any]]:
+def get_toml(cwd: Path) -> t.Tuple[Path, t.Dict[str, t.Any]]:
     """
     Specifically set defaults to {} to avoid errors when the toml file is empty.
     """
-    toml_file = _find_toml_file(cwd)
-    raw_toml = _load_toml(toml_file)
+    toml_file = find_toml_file(cwd)
+    raw_toml = load_toml(toml_file)
 
     # Attempt to find [tool.pyqwe] in the toml file
     tool_pyqwe = raw_toml.get("tool", {}).get("pyqwe", {})
@@ -69,20 +70,11 @@ def _get_toml(cwd: Path) -> t.Tuple[Path, t.Dict[str, t.Any]]:
     return toml_file, tool_pyqwe
 
 
-def _extra_rev() -> callable:
-    try:
-        from pyqwe_extra_dotenv import _replace_env_vars  # noqa
-    except ImportError:
-        raise ImportError("pyqwe_extra_dotenv package was not found")
-
-    return _replace_env_vars
-
-
-def _no_traceback_eh(exc_type, exc_val, traceback):
+def no_traceback_eh(exc_type, exc_val, traceback):
     pass
 
 
-def _split_runner(runner_: any) -> t.Tuple:
+def split_runner(runner_: any) -> t.Tuple:
     r = runner_.split(":")
     sr = r[0]  # start or runner
 
@@ -94,7 +86,7 @@ def _split_runner(runner_: any) -> t.Tuple:
     return sr, er
 
 
-def _identify_sr(sr_: str, _cwd: Path) -> t.Tuple[Path, str]:
+def identify_start_of_runner_type(sr_: str, _cwd: Path) -> t.Tuple[Path, str]:
     if sr_.endswith(".py"):
         sr_.replace(".py", "")
 
@@ -119,23 +111,26 @@ def _identify_sr(sr_: str, _cwd: Path) -> t.Tuple[Path, str]:
     raise NotAModuleOrPackage(f"{sr} is not a Python module or package\n")
 
 
-def _path_to_module(path: Path) -> str:
+def convert_path_to_module(path: Path) -> str:
     file_ = path.stem
     path_ = path.parent
     return f"{path_.name}.{file_}"
 
 
-def _extract_env_vars(r: str) -> t.List[str]:
-    if "{{" and "}}" in r:
-        return [i.split("}}")[0].replace(" ", "") for i in r.split("{{") if "}}" in i]
-    return []
-
-
-def _import_python_dotenv() -> bool:
+def try_dotenv_import(cwd: Path, env_files: list) -> bool:
     try:
-        import dotenv
+        from dotenv import load_dotenv
 
-        dotenv.load_dotenv()
+        if env_files:
+            for env_file in env_files:
+                this_file = cwd / env_file
+                if not this_file.exists():
+                    printer.error_()
+                    raise FileNotFoundError(f"Environment file {env_file} not found")
+
+                load_dotenv(env_file)
+        else:
+            load_dotenv()
 
         return True
 
@@ -143,32 +138,117 @@ def _import_python_dotenv() -> bool:
         return False
 
 
-def _replace_env_vars(r: str) -> str:
-    env_vars_ = _extract_env_vars(r)
+def find_env_vars(
+    r: str, env_marker_start: str = "{{", env_marker_end: str = "}}"
+) -> t.List[str]:
+    if env_marker_start and env_marker_end in r:
+        return [
+            i.split(env_marker_end)[0]
+            for i in r.split(env_marker_start)
+            if env_marker_end in i
+        ]
 
-    for env_var in env_vars_:
-        if not os.getenv(env_var):
-            # if env_var is not found
-            raise EnvVarNotFound(
-                "\n\r\n\r"
-                f"{Colr.FAIL}Environment variable {env_var} was not found.{Colr.END}"
-                "\n\r"
-            )
-
-        r = r.replace(f"{{{{{env_var}}}}}", os.getenv(env_var))
-
-    return r
+    return []
 
 
-def _run(sr: str, er: str, _cwd: Path) -> None:
-    extra_dotenv = importlib.util.find_spec("pyqwe_extra_dotenv")
-    if extra_dotenv:
-        rev = _extra_rev()
+def extract_and_replace_env_vars(
+    sr, er, _settings: dict
+) -> t.Tuple[str, str, t.List[str]]:
+    extra_dotenv = _settings.get("extra_dotenv", False)
+    env_ignore = _settings.get("env_ignore", False)
+    env_marker_start = _settings.get("env_marker_start", "{{")
+    env_marker_end = _settings.get("env_marker_end", "}}")
+
+    if env_ignore:
+        return sr, er, []
+
+    sr_env_vars = find_env_vars(sr, env_marker_start, env_marker_end)
+    er_env_vars = find_env_vars(er, env_marker_start, env_marker_end)
+    all_env_vars_not_found = []
+
+    if sr_env_vars or er_env_vars:
+        if not extra_dotenv:
+            if _settings["env_ignore"] is False:
+                printer.error_()
+                printer.env_vars_no_dotenv()
+                sys.exit()
+
+        else:
+            for env_var in sr_env_vars:
+                runner_part, envs_not_found = replace_env_vars(
+                    env_var, sr, env_marker_start, env_marker_end
+                )
+
+                sr = runner_part
+                all_env_vars_not_found.extend(envs_not_found)
+
+            for env_var in er_env_vars:
+                runner_part, envs_not_found = replace_env_vars(
+                    env_var, er, env_marker_start, env_marker_end
+                )
+
+                er = runner_part
+                all_env_vars_not_found.extend(envs_not_found)
+
+    return sr, er, all_env_vars_not_found
+
+
+def replace_env_vars(
+    env_var: str, runner_part: str, env_marker_start: str, env_marker_end: str
+) -> t.Tuple[str, t.List[str]]:
+    not_found = []
+    env_var_stripped = env_var.replace(" ", "")
+
+    if not os.getenv(env_var_stripped):
+        not_found.append(env_var_stripped)
     else:
-        rev = _replace_env_vars
+        runner_part = runner_part.replace(
+            f"{env_marker_start}{env_var}{env_marker_end}",
+            os.getenv(env_var_stripped, ""),
+        )
 
-    sr = rev(sr)
-    er = rev(er)
+    return runner_part, not_found
+
+
+def process_and_pre_check_env_vars(
+    runner: t.Union[str, t.List[str]], _settings: dict
+) -> t.Union[
+    t.List[t.Tuple[str, str, str, t.List[str]]],
+    t.Tuple[str, str, str, t.List[str]],
+]:
+    if isinstance(runner, str):
+        if runner[0] == "@":
+            printer.error_()
+            raise ValueError("Runner cannot start with '@'")
+
+        sr, er = split_runner(runner)
+
+        # check if there are environment variables in the runner
+        env_sr, env_er, envs_vars_not_found = extract_and_replace_env_vars(
+            sr, er, _settings
+        )
+
+        return runner, env_sr, env_er, envs_vars_not_found
+
+    sr_er = []
+
+    if runner[0][0] == "@":
+        runner.pop(0)
+
+    for r in runner:
+        sr, er = split_runner(r)
+
+        # check if there are environment variables in the runner
+        sr, er, envs_vars_not_found = extract_and_replace_env_vars(sr, er, _settings)
+
+        sr_er.append((r, sr, er, envs_vars_not_found))
+
+    return sr_er
+
+
+def run(sr: str, er: str, _cwd: Path, _settings: dict) -> None:
+    # sr: start or runner
+    # er: end of runner
 
     try:
         if "*" in sr:
@@ -186,7 +266,7 @@ def _run(sr: str, er: str, _cwd: Path) -> None:
                 subprocess.run(shlex.split(er), cwd=_cwd)
 
         else:
-            sr_path, sr_type = _identify_sr(sr, _cwd)
+            sr_path, sr_type = identify_start_of_runner_type(sr, _cwd)
 
             if sr_type == "package":
                 sys.path.append(str(sr_path.parent))
@@ -205,5 +285,5 @@ def _run(sr: str, er: str, _cwd: Path) -> None:
 
     except KeyboardInterrupt:
         if sys.excepthook is sys.__excepthook__:
-            sys.excepthook = _no_traceback_eh
+            sys.excepthook = no_traceback_eh
         raise

@@ -5,14 +5,22 @@ from pathlib import Path
 
 from pyqwe import printer
 
-from .exceptions import InvalidRunner
-from .helpers import _find_toml_file, _get_toml, _run, _split_runner, Colr
+from .exceptions import InvalidRunner, EnvVarNotFound
+from .helpers import (
+    find_toml_file,
+    get_toml,
+    try_dotenv_import,
+    process_and_pre_check_env_vars,
+    run,
+    split_runner,
+    Colr,
+)
 from .parser import ArgumentParser
 
-__version__ = "2.0.1"
+__version__ = "2.1.0"
 
 CWD = Path().cwd()
-TOML_FILE, QWE = _get_toml(CWD)
+TOML_FILE, QWE = get_toml(CWD)
 
 
 def main():
@@ -29,10 +37,30 @@ def main():
     ls_parser = subp.add_parser("ls")
     ls_parser.set_defaults(list=False)
 
-    for entry, runner in QWE.items():
-        pars.options.append((entry, runner))
+    env_ignore = QWE.get("__env_ignore__")
+    env_marker_start = QWE.get("__env_marker_start__", "{{")
+    env_marker_end = QWE.get("__env_marker_end__", "}}")
+    env_files = QWE.get("__env_files__", [])
+    if not isinstance(env_ignore, bool):
+        raise ValueError("__env_ignore__ must be a boolean")
+
+    qwe_copy = QWE.copy()
+
+    for key, value in qwe_copy.items():
+        if key.startswith("__") and key.endswith("__"):
+            del QWE[key]
+
+    settings = {
+        "env_ignore": env_ignore,
+        "env_marker_start": env_marker_start,
+        "env_marker_end": env_marker_end,
+        "extra_dotenv": try_dotenv_import(CWD, env_files),
+    }
+
+    for entry, entry_runner in QWE.items():
+        pars.options.append((entry, entry_runner))
         _ = subp.add_parser(entry)
-        _.set_defaults(entry=entry, runner=runner)
+        _.set_defaults(entry=entry, runner=entry_runner)
 
     args = pars.parse_args()
 
@@ -67,7 +95,7 @@ def main():
     ####################
     # COMMAND: <runnner>
     if hasattr(args, "runner"):
-        _runner = args.runner
+        runner = args.runner
 
     ####################
     # COMMAND: None
@@ -90,23 +118,38 @@ def main():
             printer.invalid_choice()
             sys.exit()
 
-        _runner = QWE.get(choice_index[int(choice) - 1])
+        runner = QWE.get(choice_index[int(choice) - 1])
 
     ####################
     # If runner is a group
-    if isinstance(_runner, list):
-        step_ = True if _runner[0] == "@step" else False
-        sync_ = True if _runner[0] == "@sync" else False
+    if isinstance(runner, list):
+        step_ = True if runner[0] == "@step" else False
+        sync_ = True if runner[0] == "@sync" else False
         async_ = True  # async_ is default
+
+        extracted_runners = process_and_pre_check_env_vars(runner, settings)
+
+        # Fail if any environment variables are not found in the list of runners
+        all_env_vars_not_found = []
+        for extracted in extracted_runners:
+            _, _, _, env_vars_not_found = extracted
+            all_env_vars_not_found.extend(env_vars_not_found)
+
+        if all_env_vars_not_found:
+            printer.error_()
+            raise EnvVarNotFound(
+                f"Environment variables not found: {', '.join(all_env_vars_not_found)}"
+            )
 
         if step_:  # RUNNERS IN STEP
             async_ = False
-            _runner.pop(0)
 
             printer.starting_step_runners()
 
-            for func in _runner:
-                printer.about_to_start_runner(func)
+            for extracted in extracted_runners:
+                extracted_runner, sr, er, _ = extracted
+
+                printer.about_to_start_runner(extracted_runner)
 
                 try:
                     continue_ = input(f"{Colr.WARNING}Continue? [Y/n]: {Colr.END}")
@@ -123,7 +166,7 @@ def main():
                     sys.exit()
 
                 try:
-                    _run(*_split_runner(func), _cwd=CWD)
+                    run(sr, er, _cwd=CWD, _settings=settings)
 
                 except KeyboardInterrupt:
                     printer.runner_stopped()
@@ -137,13 +180,14 @@ def main():
 
         if sync_:  # RUNNERS IN SYNC
             async_ = False
-            _runner.pop(0)
 
             printer.starting_sync_runners()
 
-            for func in _runner:
+            for extracted in extracted_runners:
+                _, sr, er, _ = extracted
+
                 try:
-                    _run(*_split_runner(func), _cwd=CWD)
+                    run(sr, er, _cwd=CWD, _settings=settings)
 
                 except KeyboardInterrupt:
                     printer.runner_stopped()
@@ -155,16 +199,16 @@ def main():
             sys.exit()
 
         if async_:
-            _runner.pop(0)
-
             printer.starting_async_runners()
 
             try:
                 func_list = []
                 threads = []
 
-                for func in _runner:
-                    func_list.append(partial(_run, *_split_runner(func), _cwd=CWD))
+                for extracted in extracted_runners:
+                    _, sr, er, _ = extracted
+
+                    func_list.append(partial(run, sr, er, _cwd=CWD, _settings=settings))
 
                 for func in func_list:
                     threads.append(threading.Thread(target=func))
@@ -188,11 +232,21 @@ def main():
 
     ####################
     # If runner is a single command
-    else:
+    if isinstance(runner, str):
+        runner, sr, er, env_vars_not_found = process_and_pre_check_env_vars(
+            runner, settings
+        )
+
+        if env_vars_not_found:
+            printer.error_()
+            raise EnvVarNotFound(
+                f"Environment variables not found: {', '.join(env_vars_not_found)}"
+            )
+
         printer.starting_runner()
 
         try:
-            _run(*_split_runner(_runner), _cwd=CWD)
+            run(sr, er, _cwd=CWD, _settings=settings)
 
         except KeyboardInterrupt:
             printer.runner_stopped()
@@ -200,3 +254,9 @@ def main():
 
         except Exception as e:
             printer.crash(e)
+
+    else:
+        ValueError(
+            f"Runner {runner} is not a valid type. Must be a string or list[string]."
+        )
+        sys.exit()
