@@ -1,47 +1,18 @@
 import sys
 import threading
-import traceback
 from functools import partial
 from pathlib import Path
 
+from pyqwe import printer
+
 from .exceptions import InvalidRunner
-from .helpers import _run, _split_runner, Colr
+from .helpers import _find_toml_file, _get_toml, _run, _split_runner, Colr
 from .parser import ArgumentParser
 
-try:
-    import tomllib
-except ImportError:
-    try:
-        import toml as tomllib
-    except ImportError:
-        raise ImportError("pyqwe requires toml, install it with 'pip install toml'")
+__version__ = "2.0.0"
 
-__version__ = "1.9.0"
-
-_cwd = Path().cwd()
-_known_toml_files = [
-    _cwd / "pyqwe.toml",
-    _cwd / "pyproject.toml",
-]
-
-
-def _find_toml_file() -> Path:
-    for file in _known_toml_files:
-        if file.exists():
-            return file
-    raise FileNotFoundError("pyproject.toml or pyqwe.toml file not found")
-
-
-_toml_file = _find_toml_file()
-_pyproject = tomllib.loads(_toml_file.read_text())
-
-if _toml_file.name == "pyqwe.toml":
-    if _pyproject.get("tool", {}).get("pyqwe", {}):
-        _qwe = _pyproject.get("tool", {}).get("pyqwe", {})
-    else:
-        _qwe = _pyproject
-else:
-    _qwe = _pyproject.get("tool", {}).get("pyqwe", {})
+CWD = Path().cwd()
+TOML_FILE, QWE = _get_toml(CWD)
 
 
 def main():
@@ -58,101 +29,142 @@ def main():
     ls_parser = subp.add_parser("ls")
     ls_parser.set_defaults(list=False)
 
-    for entry, runner in _qwe.items():
+    for entry, runner in QWE.items():
         pars.options.append((entry, runner))
         _ = subp.add_parser(entry)
         _.set_defaults(entry=entry, runner=runner)
 
     args = pars.parse_args()
 
+    ####################
+    # COMMAND: list, ls
     if hasattr(args, "list") or hasattr(args, "ls"):
-        print("")
+        printer.br()
+
         if not pars.options:
-            print(f" {Colr.WARNING}No commands found, looking in: {_toml_file.name}{Colr.END}")
+            printer.no_commands_found(TOML_FILE)
         else:
             for option in pars.options:
-
                 try:
                     if type(option[1]) not in [str, list]:
                         raise InvalidRunner()
                 except Exception as e:
                     _ = e
-                    print(f"💥🏎️⁉️ {Colr.FAIL}Invalid runner: {option}{Colr.END}")
-                    print("")
-                    sys.exit(0)
+                    printer.invalid_runner(option)
+                    sys.exit()
 
-                if isinstance(option[1], list):
-                    print(f"{Colr.OKCYAN}{option[0]}{Colr.END} {Colr.BOLD}↩︎{Colr.END}  ")
-                    for func in option[1]:
-                        print(
-                            f"  {Colr.BOLD}=>{Colr.END} {Colr.HEADER}{func}{Colr.END}"
-                        )
+                name = option[0]
+                value = option[1]
+
+                if isinstance(value, list):
+                    printer.option_value_list(name, value)
                 else:
-                    print(
-                        f"{Colr.OKCYAN}{option[0]}{Colr.END} "
-                        f"{Colr.BOLD}=>{Colr.END} "
-                        f"{Colr.HEADER}{option[1]}{Colr.END}"
-                    )
+                    printer.option_value(name, value)
 
-        print("")
-        sys.exit(0)
+        printer.br()
+        sys.exit()
 
+    ####################
+    # COMMAND: <runnner>
     if hasattr(args, "runner"):
         _runner = args.runner
 
+    ####################
+    # COMMAND: None
     else:
         if pars.errored:
-            sys.exit(0)
+            # Exit if there are errors
+            sys.exit()
 
-        choice, choice_index = pars.print_chooser(_qwe)
+        choice, choice_index = pars.print_chooser(QWE)
+
+        # Build a list of choices
 
         if not choice or not choice.isdigit():
-            sys.exit(0)
+            sys.exit()
 
         if int(choice) == 0:
-            sys.exit(0)
+            sys.exit()
 
-        if int(choice) > len(pars.options):
-            print(f" {Colr.FAIL}Invalid choice{Colr.END}")
-            sys.exit(0)
+        if int(choice) > len(pars.options) or int(choice) < 0:
+            printer.invalid_choice()
+            sys.exit()
 
-        _runner = _qwe.get(choice_index[int(choice) - 1])
+        _runner = QWE.get(choice_index[int(choice) - 1])
 
-    try:
-        if isinstance(_runner, list):
-            sync_ = True if _runner[0] == "@sync" else False
-            async_ = True if _runner[0] == "@async" else False
-            # async_ is default
+    ####################
+    # If runner is a group
+    if isinstance(_runner, list):
+        step_ = True if _runner[0] == "@step" else False
+        sync_ = True if _runner[0] == "@sync" else False
+        async_ = True  # async_ is default
 
-            if sync_:
-                _runner.pop(0)
+        if step_:  # RUNNERS IN STEP
+            async_ = False
+            _runner.pop(0)
 
-                print(f"🏎💨⏱️ {Colr.FAIL}Starting runners in sync{Colr.END}")
-                for func in _runner:
-                    try:
-                        _run(*_split_runner(func), _cwd=_cwd)
+            printer.starting_step_runners()
 
-                    except KeyboardInterrupt:
-                        print(f" 🏁🏎 {Colr.FAIL}Runner stopped{Colr.END}")
-                        break
+            for func in _runner:
+                printer.about_to_start_runner(func)
 
-                    except Exception as e:
-                        traceback.print_exc()
-                        print(f"💥🏎️⁉️ {Colr.FAIL}{e}{Colr.END}")
+                try:
+                    continue_ = input(f"{Colr.WARNING}Continue? [Y/n]: {Colr.END}")
 
-                print(f" 🏁🏎 {Colr.FAIL}Runners stopped{Colr.END}")
-                sys.exit(0)
+                    if continue_.lower() == "n":
+                        printer.runner_skipped()
+                        continue
 
-            if async_:
-                _runner.pop(0)
+                    printer.starting_runner()
+
+                except KeyboardInterrupt:
+                    printer.br()
+                    printer.runners_aborted()
+                    sys.exit()
+
+                try:
+                    _run(*_split_runner(func), _cwd=CWD)
+
+                except KeyboardInterrupt:
+                    printer.runner_stopped()
+
+                except Exception as e:
+                    printer.crash(e)
+
+                printer.runner_done()
+
+            sys.exit()
+
+        if sync_:  # RUNNERS IN SYNC
+            async_ = False
+            _runner.pop(0)
+
+            printer.starting_sync_runners()
+
+            for func in _runner:
+                try:
+                    _run(*_split_runner(func), _cwd=CWD)
+
+                except KeyboardInterrupt:
+                    printer.runner_stopped()
+
+                except Exception as e:
+                    printer.crash(e)
+
+            printer.runners_stopped()
+            sys.exit()
+
+        if async_:
+            _runner.pop(0)
+
+            printer.starting_async_runners()
 
             try:
-                print(f"🏎💨🏎💨🏎💨 {Colr.FAIL}Starting runners in async{Colr.END}")
                 func_list = []
                 threads = []
 
                 for func in _runner:
-                    func_list.append(partial(_run, *_split_runner(func), _cwd=_cwd))
+                    func_list.append(partial(_run, *_split_runner(func), _cwd=CWD))
 
                 for func in func_list:
                     threads.append(threading.Thread(target=func))
@@ -164,18 +176,27 @@ def main():
                     thread.join()
 
             except KeyboardInterrupt:
-                print(f" 🏁🏎🏎🏎 {Colr.FAIL}Runners stopped{Colr.END}")
+                printer.runners_stopped()
+                sys.exit()
 
             except Exception as e:
-                print(f"💥🏎️⁉️ {Colr.FAIL}{e}{Colr.END}")
+                printer.crash(e)
+                sys.exit()
 
-        else:
-            print(f"🏎💨 {Colr.FAIL}Starting runner{Colr.END}")
-            _run(*_split_runner(_runner), _cwd=_cwd)
+        # Exit list of runners
+        sys.exit()
 
-    except KeyboardInterrupt:
-        print(f" 🏁🏎 {Colr.FAIL}Runner stopped{Colr.END}")
+    ####################
+    # If runner is a single command
+    else:
+        printer.starting_runner()
 
-    except Exception as e:
-        traceback.print_exc()
-        print(f"💥🏎️⁉️ {Colr.FAIL}{e}{Colr.END}")
+        try:
+            _run(*_split_runner(_runner), _cwd=CWD)
+
+        except KeyboardInterrupt:
+            printer.runner_stopped()
+            sys.exit()
+
+        except Exception as e:
+            printer.crash(e)
