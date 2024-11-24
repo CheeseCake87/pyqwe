@@ -27,6 +27,48 @@ class Colr:
     END = "\033[0m"
 
 
+def _load_toml(file: Path) -> t.Dict[str, t.Any]:
+    try:
+        import tomllib
+    except ImportError:
+        try:
+            import toml as tomllib
+        except ImportError:
+            raise ImportError("pyqwe requires toml, install it with 'pip install toml'")
+
+    return tomllib.loads(file.read_text())
+
+
+def _find_toml_file(cwd: Path) -> Path:
+    _known_toml_files = [
+        cwd / "pyqwe.toml",
+        cwd / "pyproject.toml",
+    ]
+
+    for file in _known_toml_files:
+        if file.exists() and file.is_file():
+            return file
+
+    raise FileNotFoundError("No pyqwe.toml or pyproject.toml file found")
+
+
+def _get_toml(cwd: Path) -> t.Tuple[Path, t.Dict[str, t.Any]]:
+    """
+    Specifically set defaults to {} to avoid errors when the toml file is empty.
+    """
+    toml_file = _find_toml_file(cwd)
+    raw_toml = _load_toml(toml_file)
+
+    # Attempt to find [tool.pyqwe] in the toml file
+    tool_pyqwe = raw_toml.get("tool", {}).get("pyqwe", {})
+
+    if toml_file.name == "pyqwe.toml":
+        if tool_pyqwe:
+            return toml_file, tool_pyqwe
+        return toml_file, raw_toml
+    return toml_file, tool_pyqwe
+
+
 def _extra_rev() -> callable:
     try:
         from pyqwe_extra_dotenv import _replace_env_vars  # noqa
@@ -131,7 +173,7 @@ def _run(sr: str, er: str, _cwd: Path) -> None:
     try:
         if "*" in sr:
             if "(" in sr:
-                _cwd_tack = sr[sr.find("(") + 1: sr.find(")")]
+                _cwd_tack = sr[sr.find("(") + 1 : sr.find(")")]
 
                 if sys.platform == "win32":
                     _cwd_tack = _cwd_tack.replace("/", "\\")
