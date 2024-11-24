@@ -12,15 +12,6 @@ Run commands quickly from the pyproject.toml (or pyqwe.toml) file.
 ```bash
 pip install pyqwe
 ```
-
-For `.env` file support using python-dotenv:
-
-```bash
-pip install pyqwe[dotenv]
-# If zsh install extra using:
-pip install 'pyqwe[dotenv]'
-```
-
 ---
 
 <!-- TOC -->
