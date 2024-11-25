@@ -17,7 +17,7 @@ from .helpers import (
 )
 from .parser import ArgumentParser
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 CWD = Path().cwd()
 TOML_FILE, QWE = get_toml(CWD)
