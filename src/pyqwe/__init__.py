@@ -37,7 +37,7 @@ def main():
     ls_parser = subp.add_parser("ls")
     ls_parser.set_defaults(list=False)
 
-    env_ignore = QWE.get("__env_ignore__")
+    env_ignore = QWE.get("__env_ignore__", False)
     env_marker_start = QWE.get("__env_marker_start__", "{{")
     env_marker_end = QWE.get("__env_marker_end__", "}}")
     env_files = QWE.get("__env_files__", [])
