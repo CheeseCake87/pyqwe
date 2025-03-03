@@ -157,8 +157,8 @@ def extract_and_replace_env_vars(
 ) -> t.Tuple[str, str, t.List[str]]:
     extra_dotenv = _settings.get("extra_dotenv", False)
     env_ignore = _settings.get("env_ignore", False)
-    env_marker_start = _settings.get("env_marker_start", "{{")
-    env_marker_end = _settings.get("env_marker_end", "}}")
+    env_marker_start = "{{"
+    env_marker_end = "}}"
 
     if env_ignore:
         return sr, er, []
@@ -251,27 +251,38 @@ def run_clear(_cwd: Path):
     os.system("cls" if os.name == "nt" else "clear")
 
 
+def check_for_sleep(runner: str) -> str:
+    strip_runner = runner.strip()
+
+    if strip_runner.startswith("~"):
+        found = re.findall(r"~\d+~", strip_runner)
+
+        if found:
+            raw_value = found[0]
+            clean_runner = strip_runner.replace(raw_value, "")
+
+            try:
+                sleep_for = int(raw_value.replace("~", ""))
+                printer.starting_runner_after_sleep(clean_runner, sleep_for)
+                sleep(sleep_for)
+            except ValueError:
+                raise ValueError(f"Invalid sleep time: {runner}, must be an number")
+
+            return clean_runner.strip()
+
+    return strip_runner
+
+
 def run(sr: str, er: str, _cwd: Path, _settings: dict) -> None:
     # sr: start or runner
     # er: end of runner
 
     try:
-        if "|" in er:
-            _sleep_tack_value = re.findall(r"\|\d+\|", er)
-            _sleep_tack = _sleep_tack_value[0] if _sleep_tack_value else ""
-            er = er.replace(_sleep_tack, "")
-            try:
-                sleep_for = int(_sleep_tack.replace("|", ""))
-                printer.starting_runner_after_sleep(er, sleep_for)
-                sleep(sleep_for)
-            except ValueError:
-                raise ValueError(
-                    f"Invalid sleep time: {_sleep_tack}, must be an number"
-                )
-
-        printer.starting_runner()
-
         if "*" in sr:
+            end_location_runner = check_for_sleep(er)
+
+            printer.starting_runner()
+
             if "(" in sr:
                 _cwd_tack = sr[sr.find("(") + 1 : sr.find(")")]
 
@@ -281,19 +292,25 @@ def run(sr: str, er: str, _cwd: Path, _settings: dict) -> None:
                 _cwd = _cwd / _cwd_tack
 
             if "shell" in sr:
-                subprocess.run(er, shell=True, cwd=_cwd)
+                subprocess.run(end_location_runner, shell=True, cwd=_cwd)
             else:
-                subprocess.run(shlex.split(er), cwd=_cwd)
+                subprocess.run(shlex.split(end_location_runner), cwd=_cwd)
 
         else:
-            sr_path, sr_type = identify_start_of_runner_type(sr, _cwd)
+            start_location_runner = check_for_sleep(sr)
+
+            printer.starting_runner()
+
+            sr_path, sr_type = identify_start_of_runner_type(
+                start_location_runner, _cwd
+            )
 
             if sr_type == "package":
                 sys.path.append(str(sr_path.parent))
                 module = importlib.import_module(sr_path.name)
             else:
                 sys.path.append(str(_cwd))
-                module = importlib.import_module(sr)
+                module = importlib.import_module(start_location_runner)
 
             if not hasattr(module, er):
                 raise FunctionNotFound(f"\n{er} function not found \n({sr})\n")
