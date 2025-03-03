@@ -1,14 +1,15 @@
 import importlib
 import importlib.util
 import os
+import re
 import shlex
 import subprocess
 import sys
 import typing as t
 from pathlib import Path
+from time import sleep
 
 from pyqwe import printer
-
 from .exceptions import (
     FunctionNotFound,
     NotAModuleOrPackage,
@@ -246,11 +247,30 @@ def process_and_pre_check_env_vars(
     return sr_er
 
 
+def run_clear(_cwd: Path):
+    os.system("cls" if os.name == "nt" else "clear")
+
+
 def run(sr: str, er: str, _cwd: Path, _settings: dict) -> None:
     # sr: start or runner
     # er: end of runner
 
     try:
+        if "|" in er:
+            _sleep_tack_value = re.findall(r"\|\d+\|", er)
+            _sleep_tack = _sleep_tack_value[0] if _sleep_tack_value else ""
+            er = er.replace(_sleep_tack, "")
+            try:
+                sleep_for = int(_sleep_tack.replace("|", ""))
+                printer.starting_runner_after_sleep(er, sleep_for)
+                sleep(sleep_for)
+            except ValueError:
+                raise ValueError(
+                    f"Invalid sleep time: {_sleep_tack}, must be an number"
+                )
+
+        printer.starting_runner()
+
         if "*" in sr:
             if "(" in sr:
                 _cwd_tack = sr[sr.find("(") + 1 : sr.find(")")]
