@@ -31,7 +31,7 @@ __env_files__ = [".env.example"]
 gunicorn = "*:gunicorn flask_example.package:create_app()"
 cmd_mod_flask = "*:flask --app flask_example/module.py run"
 cmd_pac_flask = "*:flask --app flask_example/package run --port {{PORT}} --host {{HOST}}"
-mod_flask = "flask_example.module:run"
+mod_flask = "~10~ flask_example.module:run"
 pac_flask = "flask_example.package:run"
 pac_flask_v1 = "*:flask --app flask_example:version_1 run"
 pac_flask_v2 = "*:flask --app flask_example:version_2 run"
@@ -55,7 +55,7 @@ group_run_sync = [
 ]
 group_run_async = [
     "@async",
-    "*:|10|echo 'Hello, World! 1'",
+    "*:~10~ echo 'Hello, World! 1'",
     "*:echo 'Hello, World! 2'",
     "*:echo 'Hello, World! 3'"
 ]
