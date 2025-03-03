@@ -4,13 +4,13 @@ from functools import partial
 from pathlib import Path
 
 from pyqwe import printer
-
 from .exceptions import InvalidRunner, EnvVarNotFound
 from .helpers import (
     find_toml_file,
     get_toml,
     try_dotenv_import,
     process_and_pre_check_env_vars,
+    run_clear,
     run,
     split_runner,
     Colr,
@@ -37,9 +37,10 @@ def main():
     ls_parser = subp.add_parser("ls")
     ls_parser.set_defaults(list=False)
 
+    clear_terminal = QWE.get("__clear_terminal__", False)
     env_ignore = QWE.get("__env_ignore__", False)
-    env_marker_start = QWE.get("__env_marker_start__", "{{")
-    env_marker_end = QWE.get("__env_marker_end__", "}}")
+    env_marker_start = "{{"
+    env_marker_end = "}}"
     env_files = QWE.get("__env_files__", [])
     if not isinstance(env_ignore, bool):
         raise ValueError("__env_ignore__ must be a boolean")
@@ -51,11 +52,15 @@ def main():
             del QWE[key]
 
     settings = {
+        "clear_terminal": clear_terminal,
         "env_ignore": env_ignore,
         "env_marker_start": env_marker_start,
         "env_marker_end": env_marker_end,
         "extra_dotenv": try_dotenv_import(CWD, env_files),
     }
+
+    if settings["clear_terminal"]:
+        run_clear(_cwd=CWD)
 
     for entry, entry_runner in QWE.items():
         pars.options.append((entry, entry_runner))
@@ -158,8 +163,6 @@ def main():
                         printer.runner_skipped()
                         continue
 
-                    printer.starting_runner()
-
                 except KeyboardInterrupt:
                     printer.br()
                     printer.runners_aborted()
@@ -242,8 +245,6 @@ def main():
             raise EnvVarNotFound(
                 f"Environment variables not found: {', '.join(env_vars_not_found)}"
             )
-
-        printer.starting_runner()
 
         try:
             run(sr, er, _cwd=CWD, _settings=settings)
