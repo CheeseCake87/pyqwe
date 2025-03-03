@@ -44,6 +44,10 @@ def main():
     env_files = QWE.get("__env_files__", [])
     if not isinstance(env_ignore, bool):
         raise ValueError("__env_ignore__ must be a boolean")
+    if not isinstance(clear_terminal, bool):
+        raise ValueError("__clear_terminal__ must be a boolean")
+    if not isinstance(env_files, list):
+        raise ValueError("__env_files__ must be a list")
 
     qwe_copy = QWE.copy()
 
