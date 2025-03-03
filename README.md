@@ -12,10 +12,12 @@ Run commands quickly from the pyproject.toml (or pyqwe.toml) file.
 ```bash
 pip install pyqwe
 ```
+
 ---
 
 <!-- TOC -->
 * [🏎️💨 pyqwe](#-pyqwe)
+  * [Usage](#usage)
   * [Python commands](#python-commands)
     * [Package example](#package-example)
     * [Module example](#module-example)
@@ -23,15 +25,18 @@ pip install pyqwe
     * [Run as shell](#run-as-shell)
     * [Change the working directory](#change-the-working-directory)
   * [Grouped commands](#grouped-commands)
+  * [Waiting before starting a runner](#waiting-before-starting-a-runner)
   * [Using environment variables](#using-environment-variables)
+  * [Clearing the terminal setting](#clearing-the-terminal-setting)
   * [Other commands](#other-commands)
 <!-- TOC -->
 
 ---
 
-**_-- New in 2.1.x ↓_**
+**_-- New in 3.0.x ↓_**
 
-Advanced environment variable functionality [Using environment variables](#using-environment-variables).
+Set runners to wait x seconds before starting 
+[Waiting before starting a runner](#waiting-before-starting-a-runner)
 
 [See all releases](https://github.com/CheeseCake87/pyqwe/releases)
 
@@ -59,7 +64,8 @@ say_hello = "*:echo Hello World"
 **If you have both a pyproject.toml and a pyqwe.toml file, the pyqwe.toml
 file will be used and the pyproject.toml file will be ignored.**
 
-You will be able to see what commands you have set in the pyproject.toml file by running:
+You will be able to see what commands you have set in the pyproject.toml file
+by running:
 
 ```bash
 pyqwe list
@@ -73,7 +79,8 @@ You can run the commands by using the command name:
 pyqwe flask
 ```
 
-Running `pyqwe` without any option or command will show all available commands in a menu you can choose from.
+Running `pyqwe` without any option or command will show all available commands
+in a menu you can choose from.
 
 ```bash
 pyqwe
@@ -153,7 +160,8 @@ Will print `Hello World`.
 
 ### Run as shell
 
-To run the command as a subprocess shell command, add the `shell` key to the command.
+To run the command as a subprocess shell command, add the `shell` key to the
+command.
 
 ```toml
 [tool.pyqwe]
@@ -185,11 +193,14 @@ npm_install = "*shell(node_app):npm i"
 
 ## Grouped commands
 
-You can group commands together in a list to have one pyqwe command run multiple commands.
+You can group commands together in a list to have one pyqwe command run
+multiple commands.
 
-Grouped commands can also be run in Step, Sync, or Async mode. Async being the default.
+Grouped commands can also be run in Step, Sync, or Async mode. Async being the
+default.
 
-This will run the commands in the group in sequence, pausing for confirmation between each command:
+This will run the commands in the group in sequence, pausing for confirmation
+between each command:
 
 ```toml
 [tool.pyqwe]
@@ -225,7 +236,8 @@ group = [
 ]
 ```
 
-Of course, you can leave out the `@step`, `@sync` or `@async` to use the default async mode.
+Of course, you can leave out the `@step`, `@sync` or `@async` to use the
+default async mode.
 
 For example, this will also run the commands in the group in parallel:
 
@@ -238,15 +250,47 @@ group = [
 ]
 ```
 
+## Waiting before starting a runner
+
+Sometimes you might need to have a runner wait before starting. This might
+be the case if you have a group of runners in async mode but one runner
+connects to another.
+
+You can tell a runner to sleep for a number of seconds by using the sleep
+for marker:
+
+```toml
+[tool.pyqwe]
+group = [
+    "@async",
+    "*:~10~ echo 'Hello, World! 1'",
+    "*:echo 'Hello, World! 2'",
+    "*:echo 'Hello, World! 3'"
+]
+```
+
+This also works on module runs:
+
+```toml
+[tool.pyqwe]
+flask = "~10~ flask_app:run"
+```
+
+Each of the examples above will sleep for 10 seconds before the runner will 
+start.
+
 ## Using environment variables
 
 To use environment variables in the command, use the `{{ }}`
 markers, these markers are the default but can be changed.
 
-pyqwe will evaluate any environment variables that are set before running any commands.
+pyqwe will evaluate any environment variables that are set before running any
+commands.
 
-If pyqwe detects an environment variable that is not set, it will raise an error. An error will
-also be raised if environment variables are detected, and you do not have `python-dotenv` installed.
+If pyqwe detects an environment variable that is not set, it will raise an
+error. An error will
+also be raised if environment variables are detected, and you do not have
+`python-dotenv` installed.
 
 Here's an example of setting an environment variable in a command:
 
@@ -255,28 +299,21 @@ Here's an example of setting an environment variable in a command:
 talk = "*shell:echo {{MESSAGE}}"
 ```
 
-You can change the environment variable markers by changing the `__env_marker_start__` and `__env_marker_end__` settings
-keys.
-
-```toml
-[tool.pyqwe]
-__env_marker_start__ = "*"
-__env_marker_end__ = "*"
-talk = "*shell:echo *MESSAGE*"
-```
-
-pyqwe uses `load_dotenv()` from `python-dotenv` to load the `.env` file. You can change the name of the file to load, or
+pyqwe uses `load_dotenv()` from `python-dotenv` to load the `.env` file. You
+can change the name of the file to load, or
 add multiple env files by setting the `__env_files__` settings key.
 
 ```toml
 [tool.pyqwe]
 __env_files__ = [".env", ".env.local"]
-talk = "*shell:echo *MESSAGE*"
+talk = "*shell:echo {{MESSAGE}}"
 ```
 
-This is the same as running `load_dotenv(".env")` and `load_dotenv(".env.local")`.
+This is the same as running `load_dotenv(".env")` and
+`load_dotenv(".env.local")`.
 
-If you want to disable pyqwe from doing anything with environment variables, you can set the `__env_ignore__` settings
+If you want to disable pyqwe from doing anything with environment variables,
+you can set the `__env_ignore__` settings
 key to `true`.
 
 ```toml
@@ -285,8 +322,23 @@ __env_ignore__ = true
 talk = "*shell:echo {{MESSAGE}}"
 ```
 
-This will disable the environment variable evaluation and loading of the `.env` file, and result in `{{MESSAGE}}` being
+This will disable the environment variable evaluation and loading of the `.env`
+file, and result in `{{MESSAGE}}` being
 printed to the console in this case.
+
+## Clearing the terminal setting
+
+Setting the `__clear_terminal__` setting option to true will clear the
+terminal immediately after the `pyqwe` command is run. Results may very on
+this setting between terminals and OS platforms.
+
+This option is set to false by default.
+
+```toml
+[tool.pyqwe]
+__clear_terminal__ = true
+talk = "*shell:echo {{MESSAGE}}"
+```
 
 ## Other commands
 
