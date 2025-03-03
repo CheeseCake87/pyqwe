@@ -98,6 +98,12 @@ def about_to_start_runner(func: str):
     print(f"{Colr.OKBLUE}{func}{Colr.END}")
 
 
+def starting_runner_after_sleep(func: str, sleep_time: int):
+    br()
+    print(f"⏱️|🏎️ {Colr.OKGREEN}Waiting {sleep_time} seconds to start runner:{Colr.END}")
+    print(f"{Colr.OKBLUE}{func}{Colr.END}")
+
+
 def runner_skipped():
     print(f"🚧🏎 {Colr.FAIL}Runner skipped{Colr.END}")
 
