@@ -282,7 +282,7 @@ start.
 ## Using environment variables
 
 To use environment variables in the command, use the `{{ }}`
-markers, these markers are the default but can be changed.
+markers.
 
 pyqwe will evaluate any environment variables that are set before running any
 commands.
