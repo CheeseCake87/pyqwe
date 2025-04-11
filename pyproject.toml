@@ -29,6 +29,7 @@ output-format = "full"
 __clear_terminal__ = true
 __env_ignore__ = false
 __env_files__ = [".env.example"]
+js_example = "*(js_example):npm start"
 gunicorn = "*:gunicorn flask_example.package:create_app()"
 cmd_mod_flask = "*:flask --app flask_example/module.py run"
 cmd_pac_flask = "*:flask --app flask_example/package run --port {{PORT}} --host {{HOST}}"
