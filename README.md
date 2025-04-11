@@ -14,25 +14,29 @@ pip install pyqwe
 ---
 
 <!-- TOC -->
-* [🏎️💨 pyqwe](#-pyqwe)
-  * [Usage](#usage)
-  * [Python commands](#python-commands)
-    * [Package example](#package-example)
-    * [Module example](#module-example)
-  * [*:... commands (terminal)](#-commands-terminal)
-    * [Run as shell](#run-as-shell)
-    * [Change the working directory](#change-the-working-directory)
-  * [Grouped commands](#grouped-commands)
-  * [Waiting before starting a runner](#waiting-before-starting-a-runner)
-  * [Using environment variables](#using-environment-variables)
-  * [Clearing the terminal setting](#clearing-the-terminal-setting)
-  * [Other commands](#other-commands)
-<!-- TOC -->
 
+* [🏎️💨 pyqwe](#-pyqwe)
+    * [Usage](#usage)
+    * [Python commands](#python-commands)
+        * [Package example](#package-example)
+        * [Module example](#module-example)
+    * [*:... commands (terminal)](#-commands-terminal)
+        * [Run as shell](#run-as-shell)
+        * [Change the working directory](#change-the-working-directory)
+    * [Grouped commands](#grouped-commands)
+    * [Waiting before starting a runner](#waiting-before-starting-a-runner)
+    * [Using environment variables](#using-environment-variables)
+    * [Clearing the terminal setting](#clearing-the-terminal-setting)
+    * [Other commands](#other-commands)
+
+<!-- TOC -->
 
 ## Usage
 
 Add commands to the pyproject.toml or pyqwe.toml file.
+
+🚨**NOTE** - If you have both a pyproject.toml and a pyqwe.toml file, the pyqwe.toml
+file will be used and the pyproject.toml file will be ignored.
 
 ```toml
 [tool.pyqwe]
@@ -40,38 +44,41 @@ flask = "flask_app:run"
 say_hello = "*:echo Hello World"
 ```
 
-**If you're using a pyqwe.toml file you can drop the `[tool.pyqwe]`**
+If you're using a pyqwe.toml file you can drop the `[tool.pyqwe]`
 
 ```toml
 flask = "flask_app:run"
 say_hello = "*:echo Hello World"
 ```
 
-🚨 **NOTE** 🚨
-
-**If you have both a pyproject.toml and a pyqwe.toml file, the pyqwe.toml
-file will be used and the pyproject.toml file will be ignored.**
-
-You will be able to see what commands you have set in the pyproject.toml file
-by running:
+To see information on the available commands in the toml file you can run:
 
 ```bash
 pyqwe list
 # or
 pyqwe ls
+# or
+qwe list
+# or
+qwe ls
 ```
 
 You can run the commands by using the command name:
 
 ```bash
 pyqwe flask
+# or
+qwe flask
 ```
 
-Running `pyqwe` without any option or command will show all available commands
+Running `pyqwe` or `qwe` without any option or command 
+will show all available commands
 in a menu you can choose from.
 
 ```bash
 pyqwe
+# or
+qwe
 ```
 
 ```text
@@ -264,7 +271,7 @@ This also works on module runs:
 flask = "~10~ flask_app:run"
 ```
 
-Each of the examples above will sleep for 10 seconds before the runner will 
+Each of the examples above will sleep for 10 seconds before the runner will
 start.
 
 ## Using environment variables
