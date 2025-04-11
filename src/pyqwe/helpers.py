@@ -291,7 +291,7 @@ def run(sr: str, er: str, _cwd: Path, _settings: dict) -> None:
 
                 _cwd = _cwd / _cwd_tack
 
-            if "shell" in sr:
+            if "shell" in sr or sys.platform == "win32":
                 subprocess.run(end_location_runner, shell=True, cwd=_cwd)
             else:
                 subprocess.run(shlex.split(end_location_runner), cwd=_cwd)
