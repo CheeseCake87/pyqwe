@@ -29,16 +29,6 @@ pip install pyqwe
   * [Other commands](#other-commands)
 <!-- TOC -->
 
----
-
-**_-- New in 3.0.x ↓_**
-
-Set runners to wait x seconds before starting 
-[Waiting before starting a runner](#waiting-before-starting-a-runner)
-
-[See all releases](https://github.com/CheeseCake87/pyqwe/releases)
-
----
 
 ## Usage
 
