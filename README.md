@@ -4,8 +4,6 @@ The Quick Work Environment for Python.
 
 [![PyPI version](https://img.shields.io/pypi/v/pyqwe)](https://pypi.org/project/pyqwe/)
 [![License](https://img.shields.io/github/license/CheeseCake87/pyqwe)](https://raw.githubusercontent.com/CheeseCake87/pyqwe/main/LICENSE)
-![Downloads](https://static.pepy.tech/badge/pyqwe)
-![black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
 Run commands quickly from the pyproject.toml (or pyqwe.toml) file.
 
@@ -282,7 +280,7 @@ start.
 ## Using environment variables
 
 To use environment variables in the command, use the `{{ }}`
-markers, these markers are the default but can be changed.
+markers.
 
 pyqwe will evaluate any environment variables that are set before running any
 commands.
