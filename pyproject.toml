@@ -29,7 +29,7 @@ output-format = "full"
 __clear_terminal__ = true
 __env_ignore__ = false
 __env_files__ = [".env.example"]
-install_js_example = "*(js_example):npm install"
+
 install_flask_example = "*:pip install flask gunicorn"
 start_js_example = "*(js_example):npm start"
 gunicorn = "*:gunicorn flask_example.package:create_app()"
@@ -69,3 +69,8 @@ group_run_sync_env_var = [
     "*:echo 'Hello, World! {{ TEST }} 2'",
     "*:echo 'Hello, World! {{ TEST }} 3'"
 ]
+
+[tool.pyqwe.group.js_example]
+__header__ = "JS Example"
+install_js_example = "*(js_example):npm install"
+
