@@ -68,13 +68,13 @@ def message_(message: str):
 
 def menu_start():
     print(
-        f"🚥|🏎️ {Colr.FAIL}{Colr.BOLD}0 :{Colr.END}{Colr.END} {Colr.FAIL}Exit{Colr.END}"
+        f"🚥|🏎️ {Colr.FAIL}{Colr.BOLD}0...{Colr.END}{Colr.END} {Colr.FAIL}Exit{Colr.END}"
     )
 
 
 def menu_option(index: int, runner: str):
     print(
-        f"{Colr.BOLD}{Colr.OKCYAN}{index : 3}{Colr.END}{Colr.END} : {Colr.HEADER}{runner}{Colr.END}"
+        f"{Colr.BOLD}{Colr.OKCYAN}{index : 3}{Colr.END}{Colr.END}...{Colr.HEADER}{runner}{Colr.END}"
     )
 
 
