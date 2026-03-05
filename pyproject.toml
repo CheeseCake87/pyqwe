@@ -1,17 +1,21 @@
-[build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
-
 [project]
 name = "pyqwe"
 description = 'Run commands quickly from the pyproject.toml (or pyqwe.toml) file.'
-version = "3.1.1"
+version = "3.1.2"
 authors = [{ name = "David Carmichael", email = "david@uilix.com" }]
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE" }
 classifiers = ["License :: OSI Approved :: MIT License"]
-dynamic = ["version"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.4",
+]
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
 [project.scripts]
 pyqwe = "pyqwe:main"
