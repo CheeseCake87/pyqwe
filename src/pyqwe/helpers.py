@@ -71,7 +71,7 @@ def get_toml(cwd: Path) -> t.Tuple[Path, t.Dict[str, t.Any]]:
     return toml_file, tool_pyqwe
 
 
-def no_traceback_eh(exc_type, exc_val, traceback):
+def no_traceback_eh(*_, **__):
     pass
 
 
