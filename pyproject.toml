@@ -71,7 +71,7 @@ group_run_sync_env_var = [
     "*:echo 'Hello, World! {{ TEST }} 3'"
 ]
 
+# below is an experimental feature
 [tool.pyqwe.group.js_example]
 __header__ = "JS Example"
 install_js_example = "*(js_example):npm install"
-
