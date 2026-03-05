@@ -75,7 +75,7 @@ def no_traceback_eh(exc_type, exc_val, traceback):
     pass
 
 
-def split_runner(runner_: any) -> t.Tuple:
+def split_runner(runner_: t.Union[str]) -> t.Tuple[str, str]:
     r = runner_.split(":")
     sr = r[0]  # start or runner
 
