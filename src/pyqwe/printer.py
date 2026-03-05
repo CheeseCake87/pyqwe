@@ -8,21 +8,21 @@ from pathlib import Path
 from .helpers import Colr
 
 
-def br():
+def br() -> None:
     """
     Print a spacer line.
     """
     print("")
 
 
-def no_commands_found(toml_file: Path):
+def no_commands_found(toml_file: Path) -> None:
     """
     Print a message when no commands are found.
     """
     print(f" {Colr.WARNING}No commands found, looking in: {toml_file.name}{Colr.END}")
 
 
-def invalid_runner(option: str):
+def invalid_runner(option: str) -> None:
     """
     Print a message when an invalid runner is found.
     """
@@ -30,7 +30,7 @@ def invalid_runner(option: str):
     br()
 
 
-def env_vars_no_dotenv():
+def env_vars_no_dotenv() -> None:
     print(
         f"{Colr.FAIL}Environment variables set but python-dotenv is not installed.{Colr.END}"
         "\n\r\n\r"
@@ -45,46 +45,46 @@ def env_vars_no_dotenv():
     )
 
 
-def invalid_choice():
+def invalid_choice() -> None:
     print(f" {Colr.FAIL}Invalid choice{Colr.END}")
 
 
-def soft_crash(error):
+def soft_crash(error: Exception) -> None:
     print(f"💥🏎️⁉️{Colr.FAIL}{error}{Colr.END}")
 
 
-def crash(error: Exception):
+def crash(error: Exception) -> None:
     traceback.print_exc()
     print(f"💥🏎️⁉️{Colr.FAIL}{error}{Colr.END}")
 
 
-def error_():
+def error_() -> None:
     print(f"{Colr.FAIL}{Colr.BOLD}ERROR{Colr.END}{Colr.END}")
 
 
-def message_(message: str):
+def message_(message: str) -> None:
     print(f"{Colr.FAIL}{Colr.BOLD}{message}{Colr.END}{Colr.END}")
 
 
-def menu_start():
+def menu_start() -> None:
     print(
         f"🚥|🏎️ {Colr.FAIL}{Colr.BOLD}0...{Colr.END}{Colr.END} {Colr.FAIL}Exit{Colr.END}"
     )
 
 
-def menu_option(index: int, runner: str):
+def menu_option(index: int, runner: str) -> None:
     print(
         f"{Colr.BOLD}{Colr.OKCYAN}{index: 3}{Colr.END}{Colr.END}...{Colr.HEADER}{runner}{Colr.END}"
     )
 
 
-def option_value_list(name: str, value: list):
+def option_value_list(name: str, value: list[str]) -> None:
     print(f"{Colr.HEADER}{name}{Colr.END} {Colr.BOLD}↩︎{Colr.END}  ")
     for func in value:
         print(f"  {Colr.BOLD}=>{Colr.END} {Colr.OKBLUE}{func}{Colr.END}")
 
 
-def option_value(name, value):
+def option_value(name: str, value: str) -> None:
     print(
         f"{Colr.HEADER}{name}{Colr.END} "
         f"{Colr.BOLD}=>{Colr.END} "
@@ -92,57 +92,57 @@ def option_value(name, value):
     )
 
 
-def about_to_start_runner(func: str):
+def about_to_start_runner(func: str) -> None:
     br()
     print(f"🚥|🏎️ {Colr.OKGREEN}About to start runner:{Colr.END}")
     print(f"{Colr.OKBLUE}{func}{Colr.END}")
 
 
-def starting_runner_after_sleep(func: str, sleep_time: int):
+def starting_runner_after_sleep(func: str, sleep_time: int) -> None:
     br()
     print(f"⏱️|🏎️ {Colr.OKGREEN}Waiting {sleep_time} seconds to start runner:{Colr.END}")
     print(f"{Colr.OKBLUE}{func}{Colr.END}")
 
 
-def runner_skipped():
+def runner_skipped() -> None:
     print(f"🚧🏎 {Colr.FAIL}Runner skipped{Colr.END}")
 
 
-def starting_runner():
+def starting_runner() -> None:
     print(f"🏎💨 {Colr.OKGREEN}Starting runner{Colr.END}")
 
 
-def starting_step_runners():
+def starting_step_runners() -> None:
     print(
         f"🟢🏎💨🛑🏎 {Colr.OKGREEN}Starting runners in STEP{Colr.END} {Colr.FAIL}(ctrl + c to abort){Colr.END}"
     )
 
 
-def starting_sync_runners():
+def starting_sync_runners() -> None:
     print(f"🏎💨⏱️ {Colr.OKGREEN}Starting runners in SYNC{Colr.END}")
 
 
-def starting_async_runners():
+def starting_async_runners() -> None:
     print(f"🏎💨🏎💨🏎💨 {Colr.OKGREEN}Starting runners in ASYNC{Colr.END}")
 
 
-def runner_done():
+def runner_done() -> None:
     print(f"🏁🏎 {Colr.OKGREEN}Runner done{Colr.END}")
 
 
-def runner_stopped():
+def runner_stopped() -> None:
     print(f" 🏁🏎 {Colr.OKGREEN}Runner stopped{Colr.END}")
 
 
-def runners_stopped():
+def runners_stopped() -> None:
     print(f"🏁🏎🏎🏎 {Colr.OKGREEN}Runners stopped{Colr.END}")
 
 
-def runners_aborted():
+def runners_aborted() -> None:
     print(f"🚧🏎🏎🏎 {Colr.FAIL}Runners aborted{Colr.END}")
 
 
-def help_():
+def help_() -> None:
     print(
         "\n\r"
         f"{Colr.OKGREEN}pyqwe{Colr.END}"
