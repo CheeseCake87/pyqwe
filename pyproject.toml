@@ -11,6 +11,8 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 [dependency-groups]
 dev = [
     "ruff>=0.15.4",
+    "pyright>=1.1.406",
+    "mypy>=1.18.2",
 ]
 
 [build-system]
@@ -29,6 +31,18 @@ src = ["src"]
 fix = true
 show-fixes = true
 output-format = "full"
+
+[tool.mypy]
+python_version = "3.9"
+files = ["src/pyqwe"]
+show_error_codes = true
+pretty = true
+strict = true
+
+[tool.pyright]
+pythonVersion = "3.9"
+include = ["src/pyqwe"]
+typeCheckingMode = "basic"
 
 [tool.pyqwe]
 __clear_terminal__ = true
