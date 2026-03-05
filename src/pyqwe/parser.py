@@ -1,24 +1,29 @@
 import argparse
+from typing import Any
 
 from pyqwe import printer
 from pyqwe.helpers import Colr
 
 
 class ArgumentParser(argparse.ArgumentParser):
-    def __init__(self, *args, **kwargs):
+    program: dict[str, Any]
+    options: list[Any]
+    errored: bool
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(ArgumentParser, self).__init__(*args, **kwargs)
         self.program = {key: kwargs[key] for key in kwargs}
         self.options = []
         self.errored = False
 
-    def print_help(self, file=None):
+    def print_help(self, *args: Any, **kwargs: Any) -> None:
         printer.help_()
         printer.br()
 
-    def print_usage(self, file=None):
+    def print_usage(self, *args: Any, **kwargs: Any) -> None:
         pass
 
-    def error(self, message):
+    def error(self, message: str) -> Any:
         if "list" in message and "invalid choice:" in message:
             printer.error_()
             self.errored = True
@@ -27,7 +32,7 @@ class ArgumentParser(argparse.ArgumentParser):
             self.errored = True
 
     @staticmethod
-    def print_chooser(runners):
+    def print_chooser(runners: dict[str, Any]) -> tuple[str, list[Any]]:
         runner_index = []
         for index, runner in enumerate(runners):
             runner_index.append(runner)

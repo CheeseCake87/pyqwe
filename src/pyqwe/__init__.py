@@ -10,7 +10,8 @@ from .helpers import (
     find_toml_file,
     get_toml,
     try_dotenv_import,
-    process_and_pre_check_env_vars,
+    str_process_and_pre_check_env_vars,
+    list_process_and_pre_check_env_vars,
     run_clear,
     run,
     split_runner,
@@ -24,7 +25,7 @@ CWD = Path().cwd()
 TOML_FILE, QWE = get_toml(CWD)
 
 
-def main():
+def main() -> None:
     pars = ArgumentParser(prog="pyqwe", add_help=False)
     pars.add_argument(
         "--version", "-v", action="version", version=f"pyqwe {__version__}"
@@ -137,7 +138,7 @@ def main():
         sync_ = True if runner[0] == "@sync" else False
         async_ = True  # async_ is default
 
-        extracted_runners = process_and_pre_check_env_vars(runner, settings)
+        extracted_runners = list_process_and_pre_check_env_vars(runner, settings)
 
         # Fail if any environment variables are not found in the list of runners
         all_env_vars_not_found = []
@@ -241,7 +242,7 @@ def main():
     ####################
     # If runner is a single command
     if isinstance(runner, str):
-        runner, sr, er, env_vars_not_found = process_and_pre_check_env_vars(
+        runner, sr, er, env_vars_not_found = str_process_and_pre_check_env_vars(
             runner, settings
         )
 

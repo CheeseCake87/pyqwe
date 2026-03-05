@@ -29,16 +29,16 @@ class Colr:
     END = "\033[0m"
 
 
-def load_toml(file: Path) -> t.Dict[str, t.Any]:
+def load_toml(file: Path) -> dict[str, t.Any]:
     try:
-        import tomllib
+        import tomllib  # type: ignore
     except ImportError:
         try:
-            import toml as tomllib
+            import toml as tomllib  # type: ignore
         except ImportError:
             raise ImportError("pyqwe requires toml, install it with 'pip install toml'")
 
-    return tomllib.loads(file.read_text())
+    return tomllib.loads(file.read_text())  # type: ignore[no-any-return]
 
 
 def find_toml_file(cwd: Path) -> Path:
@@ -54,7 +54,7 @@ def find_toml_file(cwd: Path) -> Path:
     raise FileNotFoundError("No pyqwe.toml or pyproject.toml file found")
 
 
-def get_toml(cwd: Path) -> t.Tuple[Path, t.Dict[str, t.Any]]:
+def get_toml(cwd: Path) -> t.Tuple[Path, dict[str, t.Any]]:
     """
     Specifically set defaults to {} to avoid errors when the toml file is empty.
     """
@@ -71,11 +71,11 @@ def get_toml(cwd: Path) -> t.Tuple[Path, t.Dict[str, t.Any]]:
     return toml_file, tool_pyqwe
 
 
-def no_traceback_eh(*_, **__):
+def no_traceback_eh(*_: t.Any, **__: t.Any) -> None:
     pass
 
 
-def split_runner(runner_: t.Union[str]) -> t.Tuple[str, str]:
+def split_runner(runner_: str) -> t.Tuple[str, str]:
     r = runner_.split(":")
     sr = r[0]  # start or runner
 
@@ -118,9 +118,9 @@ def convert_path_to_module(path: Path) -> str:
     return f"{path_.name}.{file_}"
 
 
-def try_dotenv_import(cwd: Path, env_files: list) -> bool:
+def try_dotenv_import(cwd: Path, env_files: list[str]) -> bool:
     try:
-        from dotenv import load_dotenv
+        from dotenv import load_dotenv  # type: ignore
 
         if env_files:
             for env_file in env_files:
@@ -153,7 +153,7 @@ def find_env_vars(
 
 
 def extract_and_replace_env_vars(
-    sr, er, _settings: dict
+    sr: str, er: str, _settings: dict[str, t.Union[str, t.Any]]
 ) -> t.Tuple[str, str, t.List[str]]:
     extra_dotenv = _settings.get("extra_dotenv", False)
     env_ignore = _settings.get("env_ignore", False)
@@ -211,26 +211,9 @@ def replace_env_vars(
     return runner_part, not_found
 
 
-def process_and_pre_check_env_vars(
-    runner: t.Union[str, t.List[str]], _settings: dict
-) -> t.Union[
-    t.List[t.Tuple[str, str, str, t.List[str]]],
-    t.Tuple[str, str, str, t.List[str]],
-]:
-    if isinstance(runner, str):
-        if runner[0] == "@":
-            printer.error_()
-            raise ValueError("Runner cannot start with '@'")
-
-        sr, er = split_runner(runner)
-
-        # check if there are environment variables in the runner
-        env_sr, env_er, envs_vars_not_found = extract_and_replace_env_vars(
-            sr, er, _settings
-        )
-
-        return runner, env_sr, env_er, envs_vars_not_found
-
+def list_process_and_pre_check_env_vars(
+    runner: t.List[str], _settings: dict[str, t.Union[str, t.Any]]
+) -> t.List[t.Tuple[str, str, str, t.List[str]]]:
     sr_er = []
 
     if runner[0][0] == "@":
@@ -247,7 +230,24 @@ def process_and_pre_check_env_vars(
     return sr_er
 
 
-def run_clear(_cwd: Path):
+def str_process_and_pre_check_env_vars(
+    runner: str, _settings: dict[str, t.Union[str, t.Any]]
+) -> t.Tuple[str, str, str, t.List[str]]:
+    if runner[0] == "@":
+        printer.error_()
+        raise ValueError("Runner cannot start with '@'")
+
+    sr, er = split_runner(runner)
+
+    # check if there are environment variables in the runner
+    env_sr, env_er, envs_vars_not_found = extract_and_replace_env_vars(
+        sr, er, _settings
+    )
+
+    return runner, env_sr, env_er, envs_vars_not_found
+
+
+def run_clear(_cwd: Path) -> None:
     os.system("cls" if os.name == "nt" else "clear")
 
 
@@ -273,7 +273,9 @@ def check_for_sleep(runner: str) -> str:
     return strip_runner
 
 
-def run(sr: str, er: str, _cwd: Path, _settings: dict) -> None:
+def run(
+    sr: str, er: str, _cwd: Path, _settings: dict[str, t.Union[str, t.Any]]
+) -> None:
     # sr: start or runner
     # er: end of runner
 
