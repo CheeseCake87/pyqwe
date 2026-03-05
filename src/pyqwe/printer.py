@@ -74,7 +74,7 @@ def menu_start():
 
 def menu_option(index: int, runner: str):
     print(
-        f"{Colr.BOLD}{Colr.OKCYAN}{index : 3}{Colr.END}{Colr.END}...{Colr.HEADER}{runner}{Colr.END}"
+        f"{Colr.BOLD}{Colr.OKCYAN}{index: 3}{Colr.END}{Colr.END}...{Colr.HEADER}{runner}{Colr.END}"
     )
 
 
