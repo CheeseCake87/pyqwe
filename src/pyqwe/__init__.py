@@ -1,3 +1,4 @@
+import importlib.metadata
 import sys
 import threading
 from functools import partial
@@ -17,7 +18,7 @@ from .helpers import (
 )
 from .parser import ArgumentParser
 
-__version__ = "3.1.1"
+__version__ = importlib.metadata.version(__package__ or __name__)
 
 CWD = Path().cwd()
 TOML_FILE, QWE = get_toml(CWD)
