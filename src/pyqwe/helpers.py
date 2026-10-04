@@ -247,6 +247,10 @@ def str_process_and_pre_check_env_vars(
     return runner, env_sr, env_er, envs_vars_not_found
 
 
+def accepts_extra_args(sr: str) -> bool:
+    return sr.startswith("*") and ">" in re.sub(r"\(.*?\)", "", sr)
+
+
 def run_clear(_cwd: Path) -> None:
     os.system("cls" if os.name == "nt" else "clear")
 
@@ -293,10 +297,21 @@ def run(
 
                 _cwd = _cwd / _cwd_tack
 
+            extra_args: t.List[str] = []
+            if accepts_extra_args(sr):
+                extra_args = list(_settings.get("extra_args", []))
+
             if "shell" in sr or sys.platform == "win32":
+                if extra_args:
+                    if sys.platform == "win32":
+                        joined_args = subprocess.list2cmdline(extra_args)
+                    else:
+                        joined_args = shlex.join(extra_args)
+                    end_location_runner = f"{end_location_runner} {joined_args}"
+
                 subprocess.run(end_location_runner, shell=True, cwd=_cwd)
             else:
-                subprocess.run(shlex.split(end_location_runner), cwd=_cwd)
+                subprocess.run(shlex.split(end_location_runner) + extra_args, cwd=_cwd)
 
         else:
             start_location_runner = check_for_sleep(sr)
