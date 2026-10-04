@@ -67,7 +67,7 @@ def main() -> None:
     }
 
     if settings["clear_terminal"]:
-        run_clear(_cwd=CWD)
+        run_clear()
 
     for entry, entry_runner in QWE.items():
         pars.options.append((entry, entry_runner))

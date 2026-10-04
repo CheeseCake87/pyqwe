@@ -251,8 +251,9 @@ def accepts_extra_args(sr: str) -> bool:
     return sr.startswith("*") and ">" in re.sub(r"\(.*?\)", "", sr)
 
 
-def run_clear(_cwd: Path) -> None:
-    os.system("cls" if os.name == "nt" else "clear")
+def run_clear() -> None:
+    # Clear screen, clear scrollback, move cursor to top left
+    print("\033[2J\033[3J\033[H", end="", flush=True)
 
 
 def check_for_sleep(runner: str) -> str:
