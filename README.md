@@ -14,22 +14,20 @@ pip install pyqwe
 ---
 
 <!-- TOC -->
-
 * [🏎️💨 pyqwe](#-pyqwe)
-    * [Usage](#usage)
-    * [Python commands](#python-commands)
-        * [Package example](#package-example)
-        * [Module example](#module-example)
-    * [*:... commands (terminal)](#-commands-terminal)
-        * [Run as shell](#run-as-shell)
-        * [Change the working directory](#change-the-working-directory)
-        * [Passing extra arguments](#passing-extra-arguments)
-    * [Grouped commands](#grouped-commands)
-    * [Waiting before starting a runner](#waiting-before-starting-a-runner)
-    * [Using environment variables](#using-environment-variables)
-    * [Clearing the terminal setting](#clearing-the-terminal-setting)
-    * [Other commands](#other-commands)
-
+  * [Usage](#usage)
+  * [Python commands](#python-commands)
+    * [Package example](#package-example)
+    * [Module example](#module-example)
+  * [*:... commands (terminal)](#-commands-terminal)
+    * [Run as shell](#run-as-shell)
+    * [Change the working directory](#change-the-working-directory)
+    * [Passing extra arguments](#passing-extra-arguments)
+  * [Grouped commands](#grouped-commands)
+  * [Waiting before starting a runner](#waiting-before-starting-a-runner)
+  * [Using environment variables](#using-environment-variables)
+  * [Clearing the terminal setting](#clearing-the-terminal-setting)
+  * [Other commands](#other-commands)
 <!-- TOC -->
 
 ## Usage
