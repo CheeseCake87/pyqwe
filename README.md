@@ -23,6 +23,7 @@ pip install pyqwe
     * [*:... commands (terminal)](#-commands-terminal)
         * [Run as shell](#run-as-shell)
         * [Change the working directory](#change-the-working-directory)
+        * [Passing extra arguments](#passing-extra-arguments)
     * [Grouped commands](#grouped-commands)
     * [Waiting before starting a runner](#waiting-before-starting-a-runner)
     * [Using environment variables](#using-environment-variables)
@@ -185,6 +186,29 @@ The `shell` key is still available when changing the directory.
 [tool.pyqwe]
 npm_install = "*shell(node_app):npm i"
 ```
+
+### Passing extra arguments
+
+Adding `>` to a terminal command (`*>:...`) allows it to take extra
+arguments. Anything given after the command name is appended to the
+end of the command.
+
+```toml
+[tool.pyqwe]
+uv = "*>:uv run --env-file .env -- uv"
+```
+
+```bash
+pyqwe uv add python-dotenv
+```
+
+This will run `uv run --env-file .env -- uv add python-dotenv`.
+
+`>` can be combined with `shell` and the working directory,
+`*shell>:...`, `*(node_app)>:...` or `*shell(node_app)>:...`.
+
+Passing extra arguments to a command that is not marked with `>` will
+raise an error.
 
 ## Grouped commands
 

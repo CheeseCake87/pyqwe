@@ -3,11 +3,11 @@ import sys
 import threading
 from functools import partial
 from pathlib import Path
+from typing import Any
 
 from pyqwe import printer
 from .exceptions import InvalidRunner, EnvVarNotFound
 from .helpers import (
-    find_toml_file,
     get_toml,
     try_dotenv_import,
     str_process_and_pre_check_env_vars,
@@ -15,6 +15,7 @@ from .helpers import (
     run_clear,
     run,
     split_runner,
+    accepts_extra_args,
     Colr,
 )
 from .parser import ArgumentParser
@@ -57,7 +58,7 @@ def main() -> None:
         if key.startswith("__") and key.endswith("__"):
             del QWE[key]
 
-    settings = {
+    settings: dict[str, Any] = {
         "clear_terminal": clear_terminal,
         "env_ignore": env_ignore,
         "env_marker_start": env_marker_start,
@@ -73,7 +74,17 @@ def main() -> None:
         _ = subp.add_parser(entry)
         _.set_defaults(entry=entry, runner=entry_runner)
 
-    args = pars.parse_args()
+    # Anything after a command name is treated as extra arguments for the
+    # runner, these are only passed on to runners marked with '>' (*>:...)
+    argv = sys.argv[1:]
+    extra_args: list[str] = []
+    if argv and argv[0] in QWE:
+        extra_args = argv[1:]
+        argv = argv[:1]
+
+    settings["extra_args"] = extra_args
+
+    args = pars.parse_args(argv)
 
     ####################
     # COMMAND: list, ls
@@ -130,6 +141,18 @@ def main() -> None:
             sys.exit()
 
         runner = QWE.get(choice_index[int(choice) - 1])
+
+    if extra_args:
+        runner_parts = runner if isinstance(runner, list) else [runner]
+        if not any(
+            isinstance(r, str) and ":" in r and accepts_extra_args(split_runner(r)[0])
+            for r in runner_parts
+        ):
+            printer.error_()
+            raise ValueError(
+                "Extra arguments were given, but this command does not accept them. "
+                "Use '*>:...' to allow extra arguments."
+            )
 
     ####################
     # If runner is a group
