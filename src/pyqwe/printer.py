@@ -130,6 +130,10 @@ def runner_done() -> None:
     print(f"🏁🏎 {Colr.OKGREEN}Runner done{Colr.END}")
 
 
+def runner_failed(exit_code: int) -> None:
+    print(f"💥🏎️ {Colr.FAIL}Runner failed with exit code {exit_code}{Colr.END}")
+
+
 def runner_stopped() -> None:
     print(f" 🏁🏎 {Colr.OKGREEN}Runner stopped{Colr.END}")
 
