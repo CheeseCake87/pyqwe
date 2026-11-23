@@ -1,10 +1,10 @@
 [project]
 name = "pyqwe"
 description = 'Run commands quickly from the pyproject.toml (or pyqwe.toml) file.'
-version = "3.2.0"
+version = "4.0.0"
 authors = [{ name = "David Carmichael", email = "david@uilix.com" }]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 license = { file = "LICENSE" }
 classifiers = ["License :: OSI Approved :: MIT License"]
 
@@ -13,6 +13,7 @@ dev = [
     "ruff>=0.15.4",
     "pyright>=1.1.406",
     "mypy>=1.18.2",
+    "pytest>=8.4.2",
 ]
 
 [build-system]
@@ -33,14 +34,17 @@ show-fixes = true
 output-format = "full"
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.12"
 files = ["src/pyqwe"]
 show_error_codes = true
 pretty = true
 strict = true
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
 [tool.pyright]
-pythonVersion = "3.9"
+pythonVersion = "3.12"
 include = ["src/pyqwe"]
 typeCheckingMode = "basic"
 

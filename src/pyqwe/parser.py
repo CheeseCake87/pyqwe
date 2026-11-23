@@ -11,7 +11,7 @@ class ArgumentParser(argparse.ArgumentParser):
     errored: bool
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(ArgumentParser, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.program = {key: kwargs[key] for key in kwargs}
         self.options = []
         self.errored = False

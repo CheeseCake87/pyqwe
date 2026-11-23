@@ -5,15 +5,18 @@ import re
 import shlex
 import subprocess
 import sys
+import tomllib
 import typing as t
 from pathlib import Path
 from time import sleep
 
 from pyqwe import printer
+
 from .exceptions import (
     FunctionNotFound,
-    NotAModuleOrPackage,
+    InvalidRunner,
     NotAFunction,
+    NotAModuleOrPackage,
 )
 
 
@@ -30,15 +33,7 @@ class Colr:
 
 
 def load_toml(file: Path) -> dict[str, t.Any]:
-    try:
-        import tomllib  # type: ignore
-    except ImportError:
-        try:
-            import toml as tomllib  # type: ignore
-        except ImportError:
-            raise ImportError("pyqwe requires toml, install it with 'pip install toml'")
-
-    return tomllib.loads(file.read_text())  # type: ignore[no-any-return]
+    return tomllib.loads(file.read_text())
 
 
 def find_toml_file(cwd: Path) -> Path:
@@ -54,7 +49,7 @@ def find_toml_file(cwd: Path) -> Path:
     raise FileNotFoundError("No pyqwe.toml or pyproject.toml file found")
 
 
-def get_toml(cwd: Path) -> t.Tuple[Path, dict[str, t.Any]]:
+def get_toml(cwd: Path) -> tuple[Path, dict[str, t.Any]]:
     """
     Specifically set defaults to {} to avoid errors when the toml file is empty.
     """
@@ -75,7 +70,7 @@ def no_traceback_eh(*_: t.Any, **__: t.Any) -> None:
     pass
 
 
-def split_runner(runner_: str) -> t.Tuple[str, str]:
+def split_runner(runner_: str) -> tuple[str, str]:
     r = runner_.split(":")
     sr = r[0]  # start or runner
 
@@ -87,7 +82,36 @@ def split_runner(runner_: str) -> t.Tuple[str, str]:
     return sr, er
 
 
-def identify_start_of_runner_type(sr_: str, _cwd: Path) -> t.Tuple[Path, str]:
+def validate_runner(runner: t.Any) -> None:
+    """
+    Raise InvalidRunner if the runner is not something pyqwe can run.
+    """
+    if isinstance(runner, str):
+        if runner.startswith("@"):
+            raise InvalidRunner(f"Runner cannot start with '@': {runner!r}")
+        if ":" not in runner:
+            raise InvalidRunner(
+                f"Runner is missing ':', expected '<module>:<function>' "
+                f"or '*:<command>': {runner!r}"
+            )
+        return
+
+    if isinstance(runner, list):
+        if not all(isinstance(r, str) for r in runner):
+            raise InvalidRunner(f"All runners in a group must be strings: {runner!r}")
+        body = runner[1:] if runner and runner[0].startswith("@") else runner
+        if not body:
+            raise InvalidRunner("Group has no runners")
+        for r in body:
+            validate_runner(r)
+        return
+
+    raise InvalidRunner(
+        f"Runner must be a string or a list of strings, got {type(runner).__name__}"
+    )
+
+
+def identify_start_of_runner_type(sr_: str, _cwd: Path) -> tuple[Path, str]:
     if sr_.endswith(".py"):
         sr_.replace(".py", "")
 
@@ -141,7 +165,7 @@ def try_dotenv_import(cwd: Path, env_files: list[str]) -> bool:
 
 def find_env_vars(
     r: str, env_marker_start: str = "{{", env_marker_end: str = "}}"
-) -> t.List[str]:
+) -> list[str]:
     if env_marker_start and env_marker_end in r:
         return [
             i.split(env_marker_end)[0]
@@ -153,8 +177,8 @@ def find_env_vars(
 
 
 def extract_and_replace_env_vars(
-    sr: str, er: str, _settings: dict[str, t.Union[str, t.Any]]
-) -> t.Tuple[str, str, t.List[str]]:
+    sr: str, er: str, _settings: dict[str, str | t.Any]
+) -> tuple[str, str, list[str]]:
     extra_dotenv = _settings.get("extra_dotenv", False)
     env_ignore = _settings.get("env_ignore", False)
     env_marker_start = "{{"
@@ -196,7 +220,7 @@ def extract_and_replace_env_vars(
 
 def replace_env_vars(
     env_var: str, runner_part: str, env_marker_start: str, env_marker_end: str
-) -> t.Tuple[str, t.List[str]]:
+) -> tuple[str, list[str]]:
     not_found = []
     env_var_stripped = env_var.replace(" ", "")
 
@@ -212,12 +236,12 @@ def replace_env_vars(
 
 
 def list_process_and_pre_check_env_vars(
-    runner: t.List[str], _settings: dict[str, t.Union[str, t.Any]]
-) -> t.List[t.Tuple[str, str, str, t.List[str]]]:
+    runner: list[str], _settings: dict[str, str | t.Any]
+) -> list[tuple[str, str, str, list[str]]]:
     sr_er = []
 
-    if runner[0][0] == "@":
-        runner.pop(0)
+    if runner and runner[0].startswith("@"):
+        runner = runner[1:]
 
     for r in runner:
         sr, er = split_runner(r)
@@ -231,8 +255,8 @@ def list_process_and_pre_check_env_vars(
 
 
 def str_process_and_pre_check_env_vars(
-    runner: str, _settings: dict[str, t.Union[str, t.Any]]
-) -> t.Tuple[str, str, str, t.List[str]]:
+    runner: str, _settings: dict[str, str | t.Any]
+) -> tuple[str, str, str, list[str]]:
     if runner[0] == "@":
         printer.error_()
         raise ValueError("Runner cannot start with '@'")
@@ -278,11 +302,13 @@ def check_for_sleep(runner: str) -> str:
     return strip_runner
 
 
-def run(
-    sr: str, er: str, _cwd: Path, _settings: dict[str, t.Union[str, t.Any]]
-) -> None:
-    # sr: start or runner
-    # er: end of runner
+def run(sr: str, er: str, _cwd: Path, _settings: dict[str, str | t.Any]) -> int:
+    """
+    Run a single runner and return its exit code.
+
+    sr: start of runner
+    er: end of runner
+    """
 
     try:
         if "*" in sr:
@@ -298,7 +324,7 @@ def run(
 
                 _cwd = _cwd / _cwd_tack
 
-            extra_args: t.List[str] = []
+            extra_args: list[str] = []
             if accepts_extra_args(sr):
                 extra_args = list(_settings.get("extra_args", []))
 
@@ -310,9 +336,13 @@ def run(
                         joined_args = shlex.join(extra_args)
                     end_location_runner = f"{end_location_runner} {joined_args}"
 
-                subprocess.run(end_location_runner, shell=True, cwd=_cwd)
-            else:
-                subprocess.run(shlex.split(end_location_runner) + extra_args, cwd=_cwd)
+                return subprocess.run(
+                    end_location_runner, shell=True, cwd=_cwd
+                ).returncode
+
+            return subprocess.run(
+                shlex.split(end_location_runner) + extra_args, cwd=_cwd
+            ).returncode
 
         else:
             start_location_runner = check_for_sleep(sr)
@@ -337,6 +367,8 @@ def run(
                 getattr(module, er)()
             except TypeError:
                 raise NotAFunction(f"\n{er} is not a function. \n({sr})\n")
+
+            return 0
 
     except KeyboardInterrupt:
         if sys.excepthook is sys.__excepthook__:
