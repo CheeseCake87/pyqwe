@@ -14,6 +14,7 @@ dev = [
     "pyright>=1.1.406",
     "mypy>=1.18.2",
     "pytest>=8.4.2",
+    "python-dotenv>=1.2.4",
 ]
 
 [build-system]
@@ -53,7 +54,9 @@ __clear_terminal__ = true
 __env_ignore__ = false
 __env_files__ = [".env.example"]
 
+say_something = { run = "*:echo 'hello'", help = "Say something help description" }
 install_flask_example = "*:pip install flask gunicorn"
+install_js_example = "*(js_example):npm install"
 start_js_example = "*(js_example):npm start"
 gunicorn = "*:gunicorn flask_example.package:create_app()"
 cmd_mod_flask = "*:flask --app flask_example/module.py run"
@@ -92,8 +95,6 @@ group_run_sync_env_var = [
     "*:echo 'Hello, World! {{ TEST }} 2'",
     "*:echo 'Hello, World! {{ TEST }} 3'"
 ]
-
-# below is an experimental feature
-[tool.pyqwe.group.js_example]
-__header__ = "JS Example"
-install_js_example = "*(js_example):npm install"
+[tool.pyqwe.echoer]
+__header__ = "Echo"
+say_this_thing = "*:echo 'hello'"
