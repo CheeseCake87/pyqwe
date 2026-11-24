@@ -72,3 +72,6 @@ __pypackages__/
 /venv_3_8
 /venv_3_9
 /.env
+
+# macOS
+.DS_Store
