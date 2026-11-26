@@ -15,6 +15,21 @@ pyqwe requires Python 3.12 or newer.
 
 ---
 
+**Claude's Involvement:**
+
+- Wrote tests
+- Wrote CI
+- Fixed bugs - small and breaking
+- Moved library and typing to Python 3.12
+
+Commits:
+
+Part of - [PR 8](https://github.com/CheeseCake87/pyqwe/pull/8)
+
+- Commit - [5e92037](https://github.com/CheeseCake87/pyqwe/pull/8/changes/5e92037b0e9437fd0526312bf01f5f0a11539a3e)
+
+---
+
 <!-- TOC -->
 * [🏎️💨 pyqwe](#-pyqwe)
   * [Usage](#usage)
